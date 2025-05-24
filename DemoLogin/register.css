@@ -1,0 +1,53 @@
+/* register.css */
+body {
+  background-color: #eef4ff;
+  font-family: Arial, sans-serif;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  margin: 0;
+}
+
+.register-container {
+  background-color: #fff;
+  padding: 40px;
+  border-radius: 15px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+  width: 100%;
+  max-width: 400px;
+  text-align: center;
+}
+
+.register-container h2 {
+  color: #1a73e8;
+  margin-bottom: 20px;
+}
+
+.register-container input {
+  width: 100%;
+  padding: 12px;
+  margin-bottom: 15px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 16px;
+}
+
+.register-container button {
+  width: 100%;
+  padding: 12px;
+  background-color: #1a73e8;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  cursor: pointer;
+  margin-top: 10px;
+}
+
+.register-container a {
+  display: block;
+  margin-top: 15px;
+  color: #1a73e8;
+  text-decoration: none;
+}
