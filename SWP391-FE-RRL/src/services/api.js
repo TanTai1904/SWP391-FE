@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const BASE_URL = 'http://localhost:8080/api'; // Thay đổi URL này theo API của bạn
+const BASE_URL = 'http://localhost:1566/api'; // Updated port to 1566
 
 const api = axios.create({
   baseURL: BASE_URL,

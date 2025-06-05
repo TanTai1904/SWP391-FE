@@ -2,12 +2,8 @@ import api from './api';
 
 const doctorService = {
   getAllDoctors: async () => {
-    try {
-      const response = await api.get('/doctors');
-      return response.data;
-    } catch (error) {
-      throw error;
-    }
+    const response = await api.get('/Doctor/GetAll');
+    return response.data;
   },
 
   getDoctorById: async (id) => {

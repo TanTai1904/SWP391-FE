@@ -166,6 +166,16 @@ body {
   max-width: 500px;
 }
 
+.error-message {
+  background-color: #ffebee;
+  color: #c62828;
+  padding: 0.75rem;
+  border-radius: 4px;
+  margin-bottom: 1rem;
+  font-size: 0.9rem;
+  border: 1px solid #ffcdd2;
+}
+
 .auth-form {
   display: flex;
   flex-direction: column;

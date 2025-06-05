@@ -1,12 +1,12 @@
-import React from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import HomePage from './pages/HomePage';
-import LoginPage from './pages/LoginPage';
-import RegisterPage from './pages/RegisterPage';
-import AppointmentPage from './pages/AppointmentPage';
-import BlogPage from './pages/BlogPage';
-import DoctorsPage from './pages/DoctorsPage';
-import ServicesPage from './pages/ServicesPage';
+import React from "react";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import HomePage from "./pages/HomePage";
+import LoginPage from "./pages/LoginPage";
+import RegisterPage from "./pages/RegisterPage";
+import AppointmentPage from "./pages/AppointmentPage";
+import BlogPage from "./pages/BlogPage";
+import DoctorsPage from "./pages/DoctorsPage";
+import ServicesPage from "./pages/ServicesPage";
 
 const App = () => (
   <Router>
