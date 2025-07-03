@@ -1,0 +1,17 @@
+.home-banner {
+  background: linear-gradient(90deg, $primary-blue 60%, $white 100%);
+  color: $white;
+  padding: 4rem 2rem 2rem 2rem;
+  border-radius: $border-radius;
+  margin-bottom: 2rem;
+  h1 { color: $white; font-size: 2.5rem; }
+  p { color: $white; font-size: 1.2rem; }
+}
+.services-section {
+  background: $white;
+  border-radius: $border-radius;
+  box-shadow: 0 2px 8px rgba(37,99,235,0.05);
+  padding: 2rem;
+  margin-bottom: 2rem;
+  h2 { color: $primary-blue; }
+} 
