@@ -1,0 +1,10 @@
+.login-form {
+  background: $white;
+  border-radius: $border-radius;
+  box-shadow: 0 2px 8px rgba(37,99,235,0.08);
+  padding: 2rem 2.5rem;
+  max-width: 400px;
+  margin: 2rem auto;
+  .input { margin-bottom: 1.5rem; }
+  .btn { width: 100%; }
+} 
