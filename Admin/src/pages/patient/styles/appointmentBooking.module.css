@@ -1,0 +1,288 @@
+.bookingContainer {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 24px;
+  background-color: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.bookingHeader {
+  margin-bottom: 24px;
+  text-align: center;
+  border-bottom: 1px solid #f1f5f9;
+  padding-bottom: 16px;
+}
+
+.bookingTitle {
+  font-size: 28px;
+  font-weight: 700;
+  color: #0f4c81;
+  margin-bottom: 8px;
+}
+
+.bookingSubtitle {
+  color: #64748b;
+  font-size: 16px;
+}
+
+.bookingForm {
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+}
+
+.formSection {
+  background-color: #f8fafc;
+  border-radius: 8px;
+  padding: 20px;
+  border: 1px solid #f1f5f9;
+}
+
+.sectionTitle {
+  font-size: 18px;
+  font-weight: 600;
+  color: #334155;
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+}
+
+.formRow {
+  display: flex;
+  gap: 20px;
+  margin-bottom: 16px;
+}
+
+@media (max-width: 640px) {
+  .formRow {
+    flex-direction: column;
+  }
+}
+
+.formGroup {
+  flex: 1;
+  margin-bottom: 16px;
+}
+
+.formLabel {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 500;
+  color: #334155;
+  margin-bottom: 8px;
+}
+
+.formIcon {
+  color: #0f4c81;
+}
+
+.formInput, 
+.formSelect, 
+.formTextarea {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  font-size: 16px;
+  color: #334155;
+}
+
+.formInput:focus, 
+.formSelect:focus, 
+.formTextarea:focus {
+  border-color: #0f4c81;
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(15, 76, 129, 0.1);
+}
+
+.formTextarea {
+  min-height: 100px;
+  resize: vertical;
+}
+
+.doctorList {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 10px;
+}
+
+.doctorCard {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px;
+  border-radius: 8px;
+  background-color: #fff;
+  border: 1px solid #e2e8f0;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.doctorCard:hover {
+  border-color: #0f4c81;
+  box-shadow: 0 2px 8px rgba(15, 76, 129, 0.1);
+}
+
+.selectedDoctor {
+  border-color: #0f4c81;
+  background-color: #f0f7ff;
+  box-shadow: 0 2px 8px rgba(15, 76, 129, 0.1);
+}
+
+.doctorAvatar {
+  width: 50px;
+  height: 50px;
+  background-color: #e2e8f0;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #64748b;
+}
+
+.doctorInfo {
+  flex: 1;
+}
+
+.doctorName {
+  font-size: 16px;
+  font-weight: 600;
+  color: #334155;
+  margin-bottom: 4px;
+}
+
+.doctorSpecialty {
+  font-size: 14px;
+  color: #64748b;
+}
+
+.doctorSelect {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.appointmentTypeList {
+  display: flex;
+  gap: 16px;
+  margin-top: 10px;
+}
+
+@media (max-width: 640px) {
+  .appointmentTypeList {
+    flex-direction: column;
+  }
+}
+
+.typeCard {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px;
+  border-radius: 8px;
+  background-color: #fff;
+  border: 1px solid #e2e8f0;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.typeCard:hover {
+  border-color: #0f4c81;
+  box-shadow: 0 2px 8px rgba(15, 76, 129, 0.1);
+}
+
+.selectedType {
+  border-color: #0f4c81;
+  background-color: #f0f7ff;
+  box-shadow: 0 2px 8px rgba(15, 76, 129, 0.1);
+}
+
+.typeName {
+  font-size: 16px;
+  font-weight: 500;
+  color: #334155;
+}
+
+.errorText {
+  color: #ef4444;
+  font-size: 14px;
+  margin-top: 4px;
+}
+
+.noDoctors {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 16px;
+  background-color: #fee2e2;
+  border-radius: 6px;
+  color: #ef4444;
+  margin-top: 10px;
+}
+
+.loading {
+  padding: 16px;
+  text-align: center;
+  color: #64748b;
+}
+
+.formCheckboxLabel {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 15px;
+  color: #334155;
+}
+
+.formCheckbox {
+  width: 18px;
+  height: 18px;
+  accent-color: #0f4c81;
+}
+
+.formActions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 16px;
+  margin-top: 16px;
+}
+
+.submitButton {
+  background-color: #0f4c81;
+  color: white;
+  padding: 12px 24px;
+  border: none;
+  border-radius: 6px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.submitButton:hover {
+  background-color: #0c3d69;
+}
+
+.submitButton:disabled {
+  background-color: #94a3b8;
+  cursor: not-allowed;
+}
+
+.cancelButton {
+  padding: 12px 24px;
+  border: 1px solid #cbd5e1;
+  background-color: transparent;
+  border-radius: 6px;
+  font-weight: 500;
+  color: #64748b;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.cancelButton:hover {
+  background-color: #f8fafc;
+  border-color: #94a3b8;
+}
