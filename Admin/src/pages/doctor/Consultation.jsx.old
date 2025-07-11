@@ -1,0 +1,1410 @@
+import React from 'react';
+import ConsultationNew from './ConsultationNew';
+
+// This is just a wrapper component that redirects to the new ConsultationNew component
+const Consultation = () => {
+  return <ConsultationNew />;
+};
+
+export default Consultation;
+// Function to process API response
+const processApiResponse = (response) => {
+  if (!response || !response.data) return [];
+  
+  // Handle direct data array
+  if (Array.isArray(response.data)) {
+    return response.data;
+  }
+  
+  // Handle .NET API response with data property
+  if (response.data.data && Array.isArray(response.data.data)) {
+    return response.data.data;
+  }
+  
+  // Handle .NET API response with result property
+  if (response.data.result && Array.isArray(response.data.result)) {
+    return response.data.result;
+  }
+  
+  console.warn('Unexpected API response format:', response.data);
+  return [];
+};
+
+const Consultation = () => {
+  const [appointments, setAppointments] = useState([]);
+  const [filteredAppointments, setFilteredAppointments] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+  const [searchTerm, setSearchTerm] = useState('');
+  const [filterStatus, setFilterStatus] = useState('all');
+  const [detailsModal, setDetailsModal] = useState({ open: false, appointment: null });
+
+  // Lấy id bác sĩ từ localStorage user
+
+  const doctorId = (() => {
+    const user = localStorage.getItem('user');
+    try {
+      // Log the entire user object to debug
+      if (user) {
+        const userData = JSON.parse(user);
+        console.log('User data from localStorage:', {
+          id: userData.id,
+          doctorId: userData.doctorId, // Check both possible ID fields
+          role: userData.role || 'no role defined',
+          tokenExists: !!userData.accessToken,
+          tokenStart: userData.accessToken ? userData.accessToken.substring(0, 15) + '...' : 'no token'
+        });
+        
+        // Use doctorId if available, fallback to id
+        const finalDoctorId = userData.doctorId || userData.id;
+        console.log('Using doctor ID:', finalDoctorId);
+        return finalDoctorId;
+      }
+      console.warn('No user data found in localStorage');
+      return null;
+    } catch (error) {
+      console.error('Error parsing user data:', error);
+      return null;
+    }
+  })();
+
+  // Load appointments on component mount
+  useEffect(() => {
+    if (!doctorId) {
+      console.error('No doctor ID found, cannot load appointments');
+      setError('ID bác sĩ không hợp lệ. Vui lòng đăng nhập lại.');
+      setLoading(false);
+      return;
+    }
+    
+    console.log('Loading appointments for doctor ID:', doctorId);
+    setLoading(true);
+    
+    api.get(`/Appointment/GetByDoctorId/${doctorId}`)
+      .then(res => {
+        // Process the response data
+        const processedData = processApiResponse(res);
+        console.log('Processed appointment data:', processedData);
+        
+        setAppointments(processedData);
+        setLoading(false);
+      })
+      .catch((err) => {
+        console.error('Error loading appointments:', err);
+        
+        let errorMessage = 'Không thể tải lịch tư vấn.';
+        if (err.response?.status === 403) {
+          errorMessage = 'Bạn không có quyền xem lịch tư vấn này. Vui lòng đăng nhập lại.';
+        } else if (err.response?.status === 404) {
+          errorMessage = 'Không tìm thấy dữ liệu lịch tư vấn cho bác sĩ này.';
+        }
+        
+        setError(errorMessage);
+        setLoading(false);
+      });
+  }, [doctorId]);
+  
+  // Filter appointments based on search term and status filter
+  useEffect(() => {
+    if (appointments.length === 0) {
+      setFilteredAppointments([]);
+      return;
+    }
+    
+    let filtered = [...appointments];
+    
+    // Apply status filter
+    if (filterStatus !== 'all') {
+      filtered = filtered.filter(apt => {
+        // Handle different status naming conventions
+        const status = apt.status ? apt.status.toLowerCase() : '';
+        const filterValue = filterStatus.toLowerCase();
+        
+        if (filterValue === 'pending') {
+          return status === 'pending' || status === 'chờ xác nhận';
+        } else if (filterValue === 'confirmed') {
+          return status === 'confirmed' || status === 'scheduled' || status === 'đã xác nhận' || status === 'đã lên lịch';
+        } else if (filterValue === 'completed') {
+          return status === 'completed' || status === 'hoàn thành';
+        } else if (filterValue === 'rejected') {
+          return status === 'rejected' || status === 'cancelled' || status === 'đã hủy';
+        }
+        return true;
+      });
+    }
+    
+    // Apply search filter
+    if (searchTerm.trim() !== '') {
+      const searchLower = searchTerm.trim().toLowerCase();
+      filtered = filtered.filter(apt => 
+        (apt.patientName && apt.patientName.toLowerCase().includes(searchLower)) ||
+        (apt.appointmentDate && apt.appointmentDate.includes(searchLower)) ||
+        (apt.appointmentTime && apt.appointmentTime.includes(searchLower)) ||
+        (apt.appointmentType && apt.appointmentType.toLowerCase().includes(searchLower)) ||
+        (apt.reason && apt.reason.toLowerCase().includes(searchLower))
+      );
+    }
+    
+    setFilteredAppointments(filtered);
+  }, [appointments, searchTerm, filterStatus]);
+
+
+
+
+
+
+
+  // Modal tạo lịch tư vấn
+  const [showCreateModal, setShowCreateModal] = useState(false);
+  const [newAppointment, setNewAppointment] = useState({
+    patientName: '',
+    appointmentDate: '',
+    appointmentTime: '',
+    appointmentType: 'Tư vấn trực tiếp',
+    reason: ''
+  });
+  const [creating, setCreating] = useState(false);
+  const [createError, setCreateError] = useState('');
+
+  const handleCreateAppointment = async () => {
+    setCreating(true);
+    setCreateError('');
+    try {
+      // Validate required fields
+      if (!newAppointment.patientName || !newAppointment.appointmentDate || !newAppointment.appointmentTime) {
+        setCreateError('Vui lòng điền đầy đủ thông tin bắt buộc: tên bệnh nhân, ngày và giờ hẹn.');
+        setCreating(false);
+        return;
+      }
+      
+      // Validate date is not in the past
+      if (!validateDate(newAppointment.appointmentDate)) {
+        setCreateError('Ngày hẹn không thể là ngày trong quá khứ.');
+        setCreating(false);
+        return;
+      }
+
+      // Get user info for token debugging
+      const userStr = localStorage.getItem('user');
+      const directToken = localStorage.getItem('token');
+      console.log('Authentication state before creating appointment:', {
+        directTokenExists: !!directToken,
+        directTokenLength: directToken ? directToken.length : 0,
+        userDataExists: !!userStr
+      });
+      
+      if (!doctorId) {
+        setCreateError('Không tìm thấy ID bác sĩ. Vui lòng đăng nhập lại.');
+        setCreating(false);
+        return;
+      }
+
+      // Format date properly as yyyy-MM-dd for API
+      let formattedDate = newAppointment.appointmentDate;
+      try {
+        if (formattedDate) {
+          const date = new Date(formattedDate);
+          if (!isNaN(date.getTime())) {
+            // Format as yyyy-MM-dd (the API expects this format)
+            const year = date.getFullYear();
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const day = String(date.getDate()).padStart(2, '0');
+            formattedDate = `${year}-${month}-${day}`;
+            console.log('Formatted date for API:', formattedDate);
+          }
+        }
+      } catch (error) {
+        console.error('Error formatting date:', error);
+      }
+      
+      // Format time properly with seconds (HH:mm:ss)
+      const formattedTime = formatTimeForApi(newAppointment.appointmentTime);
+
+      // Create a clean payload according to API docs (see Swagger)
+      const payload = {
+        patientId: null,          // null for anonymous
+        doctorId: doctorId,
+        appointmentDate: formattedDate,
+        appointmentTime: formattedTime,
+        appointmentType: newAppointment.appointmentType || "Tư vấn trực tiếp",
+        isAnonymous: true,        // Mark as anonymous since we're not providing patientId
+        // These are additional fields our app uses but aren't required by API
+        patientName: newAppointment.patientName || "",
+        reason: newAppointment.reason || "",
+        note: newAppointment.note || "",
+        status: 'Pending'
+      };
+      
+      console.log('Creating appointment with payload:', payload);
+      
+      // Use the api instance with explicit headers for debugging
+      const response = await api.post('/Appointment/Create', payload);
+      
+      console.log('Create appointment response:', response);
+      
+      setShowCreateModal(false);
+      setNewAppointment({
+        patientName: '',
+        appointmentDate: '',
+        appointmentTime: '',
+        appointmentType: 'Tư vấn trực tiếp',
+        reason: ''
+      });
+      setCreating(false);
+      
+      // Reload list
+      setLoading(true);
+      const res = await api.get(`/Appointment/GetByDoctorId/${doctorId}`);
+      
+      // Handle different API response structures
+      const { processApiResponse } = require('../../services/api');
+      const processedData = processApiResponse(res);
+      
+      setAppointments(processedData);
+      setLoading(false);
+    } catch (err) {
+      console.error('Create appointment error:', err);
+      // Provide more detailed error messages
+      let errorMessage = 'Tạo lịch tư vấn thất bại';
+      
+      if (err.response?.status === 403) {
+        errorMessage = 'Bạn không có quyền tạo lịch tư vấn. Vui lòng đăng nhập lại với tài khoản có quyền phù hợp.';
+      } else if (err.response?.status === 400) {
+        // Try to extract validation errors
+        const errorData = err.response.data;
+        if (errorData.errors) {
+          const errorFields = Object.keys(errorData.errors);
+          if (errorFields.length > 0) {
+            errorMessage = `Dữ liệu không hợp lệ: ${errorFields.join(', ')}`;
+          } else {
+            errorMessage = 'Dữ liệu không hợp lệ, vui lòng kiểm tra lại.';
+          }
+        } else if (errorData.message) {
+          errorMessage = `Lỗi: ${errorData.message}`;
+        }
+      } else if (err.message) {
+        errorMessage += `: ${err.message}`;
+      }
+      
+      setCreateError(errorMessage);
+      setCreating(false);
+    }
+  };
+
+  // Modal xác nhận/từ chối/sửa lịch hẹn
+  const [editModal, setEditModal] = useState({ open: false, appointment: null, mode: 'confirm' });
+  const [editLoading, setEditLoading] = useState(false);
+  const [editError, setEditError] = useState('');
+  const [editForm, setEditForm] = useState({});
+
+  useEffect(() => {
+    if (editModal.appointment && editModal.mode === 'edit') {
+      // Include all the needed fields, especially the ID
+      // Also ensure the date format is properly handled
+      const appointment = editModal.appointment;
+      const appointmentId = appointment.appointmentId || appointment.id;
+      
+      // Format the date properly if it exists
+      let formattedDate = appointment.appointmentDate;
+      try {
+        if (formattedDate) {
+          // Try to standardize the date format for the API
+          formattedDate = new Date(formattedDate).toISOString().split('T')[0];
+        }
+      } catch (error) {
+        console.error('Error formatting date:', error);
+      }
+      
+      setEditForm({
+        id: appointmentId,
+        appointmentId: appointmentId,
+        doctorId: doctorId,
+        patientName: appointment.patientName,
+        appointmentDate: formattedDate,
+        appointmentTime: appointment.appointmentTime,
+        reason: appointment.reason,
+        note: appointment.note,
+        status: appointment.status,
+        appointmentType: appointment.appointmentType || 'Tư vấn trực tiếp'
+      });
+    }
+  }, [editModal.appointment, editModal.mode, doctorId]);
+
+  // Xác nhận lịch
+  const handleConfirm = async (apt) => {
+    setEditLoading(true);
+    setEditError('');
+    try {
+      const appointmentId = apt.appointmentId || apt.id;
+      if (!appointmentId) {
+        setEditError('Không tìm thấy ID lịch hẹn.');
+        setEditLoading(false);
+        return;
+      }
+
+      console.log('Confirming appointment with ID:', appointmentId);
+      
+      // Format date properly if needed
+      let formattedDate = apt.appointmentDate;
+      try {
+        if (formattedDate && !formattedDate.includes('-')) {
+          const date = new Date(formattedDate);
+          if (!isNaN(date.getTime())) {
+            const year = date.getFullYear();
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const day = String(date.getDate()).padStart(2, '0');
+            formattedDate = `${year}-${month}-${day}`;
+          }
+        }
+      } catch (error) {
+        console.error('Error formatting date:', error);
+      }
+      
+      // Format time properly with seconds (HH:mm:ss)
+      const formattedTime = formatTimeForApi(apt.appointmentTime);
+      
+      // Use the standard Update endpoint with proper payload structure according to API docs
+      const cleanPayload = {
+        appointmentId: appointmentId, // API requires this field
+        doctorId: doctorId,
+        appointmentDate: formattedDate,
+        appointmentTime: formattedTime,
+        appointmentType: apt.appointmentType || "Tư vấn trực tiếp",
+        status: 'Scheduled' // Set status to Scheduled for confirmation
+      };
+      
+      console.log('Confirming appointment with payload:', cleanPayload);
+      await api.put(`/Appointment/Update`, cleanPayload);
+      
+      setEditModal({ open: false, appointment: null, mode: 'confirm' });
+      
+      // Reload appointments list
+      setLoading(true);
+      const res = await api.get(`/Appointment/GetByDoctorId/${doctorId}`);
+      
+      // Handle different API response structures
+      const { processApiResponse } = require('../../services/api');
+      const processedData = processApiResponse(res);
+      
+      setAppointments(processedData);
+      setLoading(false);
+    } catch (err) {
+      console.error('Confirm error:', err);
+      // Show more detailed error messages
+      let errorMessage = 'Xác nhận lịch thất bại';
+      
+      if (err.response?.status === 403) {
+        errorMessage += ': Bạn không có quyền xác nhận lịch hẹn này.';
+      } else if (err.response?.status === 400 && err.response.data) {
+        const errorData = err.response.data;
+        if (errorData.errors) {
+          // Check specifically for appointmentTime format issues
+          if (errorData.errors['$.appointmentTime']) {
+            errorMessage += ': Định dạng thời gian không hợp lệ. Vui lòng sử dụng định dạng HH:mm:ss.';
+          } else {
+            errorMessage += `: Dữ liệu không hợp lệ - ${Object.keys(errorData.errors).join(', ')}`;
+          }
+        } else if (errorData.message) {
+          errorMessage += `: ${errorData.message}`;
+        }
+      } else if (err.message) {
+        errorMessage += `: ${err.message}`;
+      }
+      
+      setEditError(errorMessage);
+      setEditLoading(false);
+    }
+  };
+  
+  // Từ chối lịch
+  const handleReject = async (apt) => {
+    setEditLoading(true);
+    setEditError('');
+    try {
+      const appointmentId = apt.appointmentId || apt.id;
+      if (!appointmentId) {
+        setEditError('Không tìm thấy ID lịch hẹn.');
+        setEditLoading(false);
+        return;
+      }
+
+      console.log('Rejecting appointment with ID:', appointmentId);
+      
+      // Format date properly if needed
+      let formattedDate = apt.appointmentDate;
+      try {
+        if (formattedDate && !formattedDate.includes('-')) {
+          const date = new Date(formattedDate);
+          if (!isNaN(date.getTime())) {
+            const year = date.getFullYear();
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const day = String(date.getDate()).padStart(2, '0');
+            formattedDate = `${year}-${month}-${day}`;
+          }
+        }
+      } catch (error) {
+        console.error('Error formatting date:', error);
+      }
+      
+      // Format time properly with seconds (HH:mm:ss)
+      const formattedTime = formatTimeForApi(apt.appointmentTime);
+      
+      // Use the standard Update endpoint with proper payload structure according to API docs
+      const cleanPayload = {
+        appointmentId: appointmentId, // API requires this field
+        doctorId: doctorId,
+        appointmentDate: formattedDate,
+        appointmentTime: formattedTime,
+        appointmentType: apt.appointmentType || "Tư vấn trực tiếp",
+        status: 'Cancelled' // Set status to Cancelled for rejection
+      };
+      
+      console.log('Rejecting appointment with payload:', cleanPayload);
+      await api.put(`/Appointment/Update`, cleanPayload);
+      
+      setEditModal({ open: false, appointment: null, mode: 'confirm' });
+      
+      // Reload appointments list
+      setLoading(true);
+      const res = await api.get(`/Appointment/GetByDoctorId/${doctorId}`);
+      
+      // Handle different API response structures
+      const { processApiResponse } = require('../../services/api');
+      const processedData = processApiResponse(res);
+      
+      setAppointments(processedData);
+      setLoading(false);
+    } catch (err) {
+      console.error('Reject error:', err);
+      
+      // Show more detailed error messages
+      let errorMessage = 'Từ chối lịch thất bại';
+      
+      if (err.response?.status === 403) {
+        errorMessage += ': Bạn không có quyền từ chối lịch hẹn này.';
+      } else if (err.response?.status === 400 && err.response.data) {
+        const errorData = err.response.data;
+        if (errorData.errors) {
+          // Check specifically for appointmentTime format issues
+          if (errorData.errors['$.appointmentTime']) {
+            errorMessage += ': Định dạng thời gian không hợp lệ. Vui lòng sử dụng định dạng HH:mm:ss.';
+          } else {
+            errorMessage += `: Dữ liệu không hợp lệ - ${Object.keys(errorData.errors).join(', ')}`;
+          }
+        } else if (errorData.message) {
+          errorMessage += `: ${errorData.message}`;
+        }
+      } else if (err.message) {
+        errorMessage += `: ${err.message}`;
+      }
+      
+      setEditError(errorMessage);
+      setEditLoading(false);
+    }
+  };
+  
+  // Sửa lịch
+  const handleEdit = async () => {
+    setEditLoading(true);
+    setEditError('');
+    try {
+      // Make sure we have the appointment ID
+      if (!editForm.id && !editForm.appointmentId) {
+        setEditError('Không tìm thấy ID lịch hẹn.');
+        setEditLoading(false);
+        return;
+      }
+
+      // Validate date is not in the past
+      if (!validateDate(editForm.appointmentDate)) {
+        setEditError('Ngày hẹn không thể là ngày trong quá khứ.');
+        setEditLoading(false);
+        return;
+      }
+
+      const appointmentId = editForm.appointmentId || editForm.id;
+      console.log('Editing appointment with ID:', appointmentId);
+
+      // Format date properly for the API
+      let formattedDate = editForm.appointmentDate;
+      try {
+        if (formattedDate) {
+          const date = new Date(formattedDate);
+          if (!isNaN(date.getTime())) {
+            // Format as yyyy-MM-dd (the API expects this format)
+            const year = date.getFullYear();
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const day = String(date.getDate()).padStart(2, '0');
+            formattedDate = `${year}-${month}-${day}`;
+            console.log('Formatted date for API:', formattedDate);
+          }
+        }
+      } catch (error) {
+        console.error('Error formatting date:', error);
+      }
+      
+      // Format time properly with seconds (HH:mm:ss)
+      const formattedTime = formatTimeForApi(editForm.appointmentTime);
+
+      // Prepare a clean payload with properly formatted values according to the API docs
+      const cleanPayload = {
+        appointmentId: appointmentId,  // API requires this field
+        doctorId: doctorId,  // Use doctorId from the component state
+        appointmentDate: formattedDate,
+        appointmentTime: formattedTime,
+        appointmentType: editForm.appointmentType || "Tư vấn trực tiếp",
+        status: editForm.status || "Scheduled"
+      };
+      
+      console.log('Editing appointment with payload:', cleanPayload);
+      
+      // Use the standard Update endpoint
+      await api.put(`/Appointment/Update`, cleanPayload);
+      
+      setEditModal({ open: false, appointment: null, mode: 'edit' });
+      setEditLoading(false);
+      
+      // Reload appointments
+      setLoading(true);
+      const res = await api.get(`/Appointment/GetByDoctorId/${doctorId}`);
+      
+      // Handle different API response structures
+      const { processApiResponse } = require('../../services/api');
+      const processedData = processApiResponse(res);
+      
+      setAppointments(processedData);
+      setLoading(false);
+    } catch (err) {
+      console.error('Edit appointment error:', err);
+      
+      // Show more detailed error messages
+      let errorMessage = 'Cập nhật lịch thất bại';
+      
+      if (err.response?.status === 403) {
+        errorMessage += ': Bạn không có quyền cập nhật lịch hẹn này.';
+      } else if (err.response?.status === 400 && err.response.data) {
+        const errorData = err.response.data;
+        if (errorData.errors) {
+          // Check specifically for appointmentTime format issues
+          if (errorData.errors['$.appointmentTime']) {
+            errorMessage += ': Định dạng thời gian không hợp lệ. Vui lòng sử dụng định dạng HH:mm:ss.';
+          } else {
+            errorMessage += `: Dữ liệu không hợp lệ - ${Object.keys(errorData.errors).join(', ')}`;
+          }
+        } else if (errorData.message) {
+          errorMessage += `: ${errorData.message}`;
+        }
+      } else if (err.message) {
+        errorMessage += `: ${err.message}`;
+      }
+      
+      setEditError(errorMessage);
+      setEditLoading(false);
+    }
+  };
+
+  // Handle search input change
+  const handleSearchChange = (e) => {
+    setSearchTerm(e.target.value);
+  };
+  
+  // Handle filter change
+  const handleFilterChange = (status) => {
+    setFilterStatus(status);
+  };
+
+  // Open appointment details modal
+  const openDetailsModal = (appointment) => {
+    setDetailsModal({ open: true, appointment });
+  };
+  
+  // Close appointment details modal
+  const closeDetailsModal = () => {
+    setDetailsModal({ open: false, appointment: null });
+  };
+  
+  // Handle appointment confirmation
+  const handleConfirmAppointment = async (appointment) => {
+    try {
+      const appointmentId = appointment.appointmentId || appointment.id;
+      if (!appointmentId) {
+        toast.error('ID lịch hẹn không hợp lệ');
+        return;
+      }
+      
+      // Update appointment status to confirmed
+      await api.put('/Appointment/Update', {
+        appointmentId: appointmentId,
+        status: 'Scheduled',
+        doctorId: doctorId
+      });
+      
+      toast.success('Đã xác nhận lịch hẹn');
+      
+      // Reload appointments
+      setLoading(true);
+      const res = await api.get(`/Appointment/GetByDoctorId/${doctorId}`);
+      const updatedAppointments = processApiResponse(res);
+      setAppointments(updatedAppointments);
+      setLoading(false);
+      
+      // Close modal if open
+      if (detailsModal.open && detailsModal.appointment?.id === appointmentId) {
+        closeDetailsModal();
+      }
+    } catch (error) {
+      console.error('Error confirming appointment:', error);
+      toast.error('Không thể xác nhận lịch hẹn');
+    }
+  };
+  
+  // Handle appointment rejection
+  const handleRejectAppointment = async (appointment, reason = 'Bác sĩ không sắp xếp được lịch') => {
+    try {
+      const appointmentId = appointment.appointmentId || appointment.id;
+      if (!appointmentId) {
+        toast.error('ID lịch hẹn không hợp lệ');
+        return;
+      }
+      
+      // Update appointment status to cancelled/rejected
+      await api.put('/Appointment/Update', {
+        appointmentId: appointmentId,
+        status: 'Cancelled',
+        note: reason,
+        doctorId: doctorId
+      });
+      
+      toast.success('Đã từ chối lịch hẹn');
+      
+      // Reload appointments
+      setLoading(true);
+      const res = await api.get(`/Appointment/GetByDoctorId/${doctorId}`);
+      const updatedAppointments = processApiResponse(res);
+      setAppointments(updatedAppointments);
+      setLoading(false);
+      
+      // Close modal if open
+      if (detailsModal.open && detailsModal.appointment?.id === appointmentId) {
+        closeDetailsModal();
+      }
+    } catch (error) {
+      console.error('Error rejecting appointment:', error);
+      toast.error('Không thể từ chối lịch hẹn');
+    }
+  };
+  
+  // Handle marking appointment as completed
+  const handleCompleteAppointment = async (appointment) => {
+    try {
+      const appointmentId = appointment.appointmentId || appointment.id;
+      if (!appointmentId) {
+        toast.error('ID lịch hẹn không hợp lệ');
+        return;
+      }
+      
+      // Update appointment status to completed
+      await api.put('/Appointment/Update', {
+        appointmentId: appointmentId,
+        status: 'Completed',
+        doctorId: doctorId
+      });
+      
+      toast.success('Đã đánh dấu lịch hẹn hoàn thành');
+      
+      // Reload appointments
+      setLoading(true);
+      const res = await api.get(`/Appointment/GetByDoctorId/${doctorId}`);
+      const updatedAppointments = processApiResponse(res);
+      setAppointments(updatedAppointments);
+      setLoading(false);
+      
+      // Close modal if open
+      if (detailsModal.open && detailsModal.appointment?.id === appointmentId) {
+        closeDetailsModal();
+      }
+    } catch (error) {
+      console.error('Error completing appointment:', error);
+      toast.error('Không thể đánh dấu lịch hẹn hoàn thành');
+    }
+  };
+  
+  // Get badge component based on status
+  const getStatusBadge = (status) => {
+    const statusLower = status?.toLowerCase() || '';
+    
+    if (statusLower.includes('confirm') || statusLower.includes('scheduled') || statusLower.includes('xác nhận') || statusLower.includes('lịch')) {
+      return <Badge className={styles.badgeConfirmed}>Đã xác nhận</Badge>;
+    } else if (statusLower.includes('complet') || statusLower.includes('hoàn thành')) {
+      return <Badge className={styles.badgeCompleted}>Hoàn thành</Badge>;
+    } else if (statusLower.includes('cancel') || statusLower.includes('reject') || statusLower.includes('hủy')) {
+      return <Badge className={styles.badgeRejected}>Đã hủy</Badge>;
+    } else if (statusLower.includes('pending') || statusLower.includes('chờ')) {
+      return <Badge className={styles.badgePending}>Chờ xác nhận</Badge>;
+    }
+    
+    return <Badge className={styles.badgePending}>{status || 'Không xác định'}</Badge>;
+  };
+  
+  // Get icon based on appointment type
+  const getTypeIcon = (type) => {
+    const typeLower = type?.toLowerCase() || '';
+    
+    if (typeLower.includes('trực tiếp')) {
+      return <Users className={styles.iconType} size={16} />;
+    } else if (typeLower.includes('online') || typeLower.includes('trực tuyến')) {
+      return <Calendar className={styles.iconType} size={16} />;
+    }
+    
+    return <FileText className={styles.iconType} size={16} />;
+  };
+
+  // Format date for display
+  const formatDisplayDate = (dateString) => {
+    if (!dateString) return '';
+    
+    try {
+      const date = new Date(dateString);
+      if (isNaN(date.getTime())) return dateString;
+      
+      return date.toLocaleDateString('vi-VN', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+      });
+    } catch (error) {
+      return dateString;
+    }
+  };
+  
+  return (
+    <div className={styles.consultationContainer}>
+      <div className={styles.consultationHeader}>
+        <h2 className={styles.consultationTitle}>Quản lý lịch hẹn khám bệnh</h2>
+        <Button onClick={() => setShowCreateModal(true)} className={styles.createButton}>
+          <Plus size={16} /> Tạo lịch hẹn mới
+        </Button>
+      </div>
+      
+      <div className={styles.filterSection}>
+        <div className={styles.searchBox}>
+          <Search size={18} className={styles.searchIcon} />
+          <Input
+            type="text"
+            placeholder="Tìm kiếm theo tên bệnh nhân, ngày hẹn..."
+            value={searchTerm}
+            onChange={handleSearchChange}
+            className={styles.searchInput}
+          />
+        </div>
+        
+        <div className={styles.filterButtons}>
+          <Button 
+            variant={filterStatus === 'all' ? 'default' : 'outline'} 
+            onClick={() => handleFilterChange('all')}
+            className={styles.filterButton}
+          >
+            Tất cả
+          </Button>
+          <Button 
+            variant={filterStatus === 'pending' ? 'default' : 'outline'} 
+            onClick={() => handleFilterChange('pending')}
+            className={styles.filterButton}
+          >
+            <Badge className={styles.badgePending}>Chờ xác nhận</Badge>
+          </Button>
+          <Button 
+            variant={filterStatus === 'confirmed' ? 'default' : 'outline'} 
+            onClick={() => handleFilterChange('confirmed')}
+            className={styles.filterButton}
+          >
+            <Badge className={styles.badgeConfirmed}>Đã xác nhận</Badge>
+          </Button>
+          <Button 
+            variant={filterStatus === 'completed' ? 'default' : 'outline'} 
+            onClick={() => handleFilterChange('completed')}
+            className={styles.filterButton}
+          >
+            <Badge className={styles.badgeCompleted}>Hoàn thành</Badge>
+          </Button>
+          <Button 
+            variant={filterStatus === 'rejected' ? 'default' : 'outline'} 
+            onClick={() => handleFilterChange('rejected')}
+            className={styles.filterButton}
+          >
+            <Badge className={styles.badgeRejected}>Đã hủy</Badge>
+          </Button>
+        </div>
+      </div>
+      
+      {loading && (
+        <div className={styles.loading}>
+          <Loader2 size={40} className={styles.loadingSpinner} />
+          <p>Đang tải dữ liệu...</p>
+        </div>
+      )}
+      
+      {error && (
+        <div className={styles.errorMessage}>
+          <AlertCircle size={20} />
+          <span>{error}</span>
+        </div>
+      )}
+      
+      {!loading && !error && filteredAppointments.length === 0 && (
+        <div className={styles.emptyState}>
+          <FileText size={48} className={styles.emptyStateIcon} />
+          <h3>Không tìm thấy lịch hẹn nào</h3>
+          <p>
+            {searchTerm || filterStatus !== 'all' 
+              ? 'Không có lịch hẹn nào phù hợp với tiêu chí tìm kiếm' 
+              : 'Hiện tại bạn chưa có lịch hẹn nào'}
+          </p>
+        </div>
+      )}
+      
+      {!loading && !error && filteredAppointments.length > 0 && (
+        <div className={styles.cardsGrid}>
+          {filteredAppointments.map(appointment => (
+            <div key={appointment.id || appointment.appointmentId} className={styles.card}>
+              <div className={styles.cardHeader}>
+                <h3 className={styles.patientName}>
+                  {appointment.patientName || 'Bệnh nhân ẩn danh'}
+                </h3>
+                {getStatusBadge(appointment.status)}
+              </div>
+              
+              <div className={styles.cardContent}>
+                <div className={styles.infoRow}>
+                  <Calendar size={16} className={styles.infoIcon} />
+                  <span className={styles.infoLabel}>Ngày hẹn:</span>
+                  <span className={styles.infoValue}>{formatDisplayDate(appointment.appointmentDate)}</span>
+                </div>
+                
+                <div className={styles.infoRow}>
+                  <Clock size={16} className={styles.infoIcon} />
+                  <span className={styles.infoLabel}>Giờ hẹn:</span>
+                  <span className={styles.infoValue}>{appointment.appointmentTime}</span>
+                </div>
+                
+                <div className={styles.infoRow}>
+                  {getTypeIcon(appointment.appointmentType)}
+                  <span className={styles.infoLabel}>Loại tư vấn:</span>
+                  <span className={styles.infoValue}>{appointment.appointmentType || 'Tư vấn trực tiếp'}</span>
+                </div>
+                
+                {appointment.reason && (
+                  <div className={styles.infoRow}>
+                    <AlertCircle size={16} className={styles.infoIcon} />
+                    <span className={styles.infoLabel}>Lý do khám:</span>
+                    <span className={styles.infoValue}>{appointment.reason}</span>
+                  </div>
+                )}
+              </div>
+              
+              <div className={styles.cardActions}>
+                {(appointment.status === 'Pending' || appointment.status === 'pending' || 
+                  appointment.status === 'Chờ xác nhận') && (
+                  <>
+                    <Button 
+                      className={styles.actionButton + ' ' + styles.successButton} 
+                      onClick={() => handleConfirmAppointment(appointment)}
+                    >
+                      <Check size={16} /> Xác nhận
+                    </Button>
+                    <Button 
+                      className={styles.actionButton + ' ' + styles.dangerButton}
+                      onClick={() => handleRejectAppointment(appointment)}
+                    >
+                      <X size={16} /> Từ chối
+                    </Button>
+                  </>
+                )}
+                
+                {(appointment.status === 'Scheduled' || appointment.status === 'confirmed' || 
+                  appointment.status === 'Đã lên lịch' || appointment.status === 'Đã xác nhận') && (
+                  <Button 
+                    className={styles.actionButton + ' ' + styles.primaryButton}
+                    onClick={() => handleCompleteAppointment(appointment)}
+                  >
+                    <Check size={16} /> Đánh dấu hoàn thành
+                  </Button>
+                )}
+                
+                <Button 
+                  className={styles.actionButton + ' ' + styles.outlineButton}
+                  onClick={() => openDetailsModal(appointment)}
+                >
+                  Chi tiết
+                </Button>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+      
+      {/* Appointment Details Modal */}
+      {detailsModal.open && detailsModal.appointment && (
+        <div className={styles.modal}>
+          <div className={styles.modalContent}>
+            <div className={styles.modalHeader}>
+              <h3 className={styles.modalTitle}>Chi tiết lịch hẹn</h3>
+              <button className={styles.modalClose} onClick={closeDetailsModal}>×</button>
+            </div>
+            <div className={styles.modalBody}>
+              <div className={styles.appointmentDetails}>
+                <div className={styles.detailRow}>
+                  <h4 className={styles.detailLabel}>Trạng thái:</h4>
+                  <div className={styles.detailValue}>
+                    {getStatusBadge(detailsModal.appointment.status)}
+                  </div>
+                </div>
+                
+                <div className={styles.detailRow}>
+                  <h4 className={styles.detailLabel}>Tên bệnh nhân:</h4>
+                  <div className={styles.detailValue}>
+                    {detailsModal.appointment.patientName || 'Bệnh nhân ẩn danh'}
+                  </div>
+                </div>
+                
+                <div className={styles.detailRow}>
+                  <h4 className={styles.detailLabel}>Ngày hẹn:</h4>
+                  <div className={styles.detailValue}>
+                    {formatDisplayDate(detailsModal.appointment.appointmentDate)}
+                  </div>
+                </div>
+                
+                <div className={styles.detailRow}>
+                  <h4 className={styles.detailLabel}>Giờ hẹn:</h4>
+                  <div className={styles.detailValue}>
+                    {detailsModal.appointment.appointmentTime}
+                  </div>
+                </div>
+                
+                <div className={styles.detailRow}>
+                  <h4 className={styles.detailLabel}>Loại tư vấn:</h4>
+                  <div className={styles.detailValue}>
+                    {detailsModal.appointment.appointmentType || 'Tư vấn trực tiếp'}
+                  </div>
+                </div>
+                
+                {detailsModal.appointment.reason && (
+                  <div className={styles.detailRow}>
+                    <h4 className={styles.detailLabel}>Lý do khám:</h4>
+                    <div className={styles.detailValue}>
+                      {detailsModal.appointment.reason}
+                    </div>
+                  </div>
+                )}
+                
+                {detailsModal.appointment.note && (
+                  <div className={styles.detailRow}>
+                    <h4 className={styles.detailLabel}>Ghi chú:</h4>
+                    <div className={styles.detailValue}>
+                      {detailsModal.appointment.note}
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+            <div className={styles.modalFooter}>
+              {(detailsModal.appointment.status === 'Pending' || 
+                detailsModal.appointment.status === 'pending' || 
+                detailsModal.appointment.status === 'Chờ xác nhận') && (
+                <>
+                  <Button 
+                    className={styles.actionButton + ' ' + styles.successButton} 
+                    onClick={() => handleConfirmAppointment(detailsModal.appointment)}
+                  >
+                    <Check size={16} /> Xác nhận
+                  </Button>
+                  <Button 
+                    className={styles.actionButton + ' ' + styles.dangerButton}
+                    onClick={() => handleRejectAppointment(detailsModal.appointment)}
+                  >
+                    <X size={16} /> Từ chối
+                  </Button>
+                </>
+              )}
+              
+              {(detailsModal.appointment.status === 'Scheduled' || 
+                detailsModal.appointment.status === 'confirmed' || 
+                detailsModal.appointment.status === 'Đã lên lịch' || 
+                detailsModal.appointment.status === 'Đã xác nhận') && (
+                <Button 
+                  className={styles.actionButton + ' ' + styles.primaryButton}
+                  onClick={() => handleCompleteAppointment(detailsModal.appointment)}
+                >
+                  <Check size={16} /> Đánh dấu hoàn thành
+                </Button>
+              )}
+              
+              <Button 
+                className={styles.actionButton + ' ' + styles.outlineButton}
+                onClick={closeDetailsModal}
+              >
+                Đóng
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
+      
+      {/* Create Appointment Modal */}
+      {showCreateModal && (
+        <div className={styles.modal}>
+          <div className={styles.modalContent}>
+            <div className={styles.modalHeader}>
+              <h3 className={styles.modalTitle}>Tạo lịch hẹn mới</h3>
+              <button className={styles.modalClose} onClick={() => setShowCreateModal(false)}>×</button>
+            </div>
+            <div className={styles.modalBody}>
+              <div className={styles.formGroup}>
+                <label className={styles.formLabel}>Tên bệnh nhân:</label>
+                <Input
+                  type="text"
+                  name="patientName"
+                  value={newAppointment.patientName}
+                  onChange={(e) => setNewAppointment({...newAppointment, patientName: e.target.value})}
+                  className={styles.formInput}
+                  placeholder="Nhập tên bệnh nhân"
+                />
+              </div>
+              
+              <div className={styles.formGroup}>
+                <label className={styles.formLabel}>Ngày hẹn:</label>
+                <Input
+                  type="date"
+                  name="appointmentDate"
+                  value={newAppointment.appointmentDate}
+                  onChange={(e) => setNewAppointment({...newAppointment, appointmentDate: e.target.value})}
+                  className={styles.formInput}
+                  min={new Date().toISOString().split('T')[0]}
+                />
+              </div>
+              
+              <div className={styles.formGroup}>
+                <label className={styles.formLabel}>Giờ hẹn:</label>
+                <Input
+                  type="time"
+                  name="appointmentTime"
+                  value={newAppointment.appointmentTime}
+                  onChange={(e) => setNewAppointment({...newAppointment, appointmentTime: e.target.value})}
+                  className={styles.formInput}
+                />
+              </div>
+              
+              <div className={styles.formGroup}>
+                <label className={styles.formLabel}>Loại tư vấn:</label>
+                <select
+                  name="appointmentType"
+                  value={newAppointment.appointmentType}
+                  onChange={(e) => setNewAppointment({...newAppointment, appointmentType: e.target.value})}
+                  className={styles.formSelect}
+                >
+                  <option value="Tư vấn trực tiếp">Tư vấn trực tiếp</option>
+                  <option value="Tư vấn trực tuyến">Tư vấn trực tuyến</option>
+                </select>
+              </div>
+              
+              <div className={styles.formGroup}>
+                <label className={styles.formLabel}>Lý do khám:</label>
+                <Textarea
+                  name="reason"
+                  value={newAppointment.reason}
+                  onChange={(e) => setNewAppointment({...newAppointment, reason: e.target.value})}
+                  className={styles.formTextarea}
+                  placeholder="Nhập lý do khám"
+                />
+              </div>
+              
+              {createError && (
+                <div className={styles.errorMessage}>{createError}</div>
+              )}
+            </div>
+            <div className={styles.modalFooter}>
+              <Button 
+                className={styles.actionButton + ' ' + styles.outlineButton}
+                onClick={() => setShowCreateModal(false)}
+                disabled={creating}
+              >
+                Hủy
+              </Button>
+              <Button 
+                className={styles.actionButton + ' ' + styles.primaryButton}
+                onClick={handleCreateAppointment}
+                disabled={creating}
+              >
+                {creating ? (
+                  <>
+                    <Loader2 size={16} className={styles.loadingSpinner} />
+                    Đang xử lý...
+                  </>
+                ) : (
+                  <>
+                    <Plus size={16} /> Tạo lịch hẹn
+                  </>
+                )}
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
+      
+      {!loading && (
+        <div className={styles.appointmentsList}>
+          <div className={styles.appointmentsHeader}>
+            <Button
+              onClick={() => setShowCreateModal(true)}
+              className={styles.createButton}
+            >
+              <Plus size={16} />
+              Tạo lịch hẹn mới
+            </Button>
+          </div>
+          {appointments.length === 0 ? (
+            <div className={styles.noAppointments}>
+              Chưa có lịch hẹn nào.
+            </div>
+          ) : (
+            <div className={styles.appointmentsWrapper}>
+              {appointments.map(appointment => (
+                <div key={appointment.appointmentId} className={styles.appointmentItem}>
+                  <div className={styles.appointmentDetails}>
+                    <div className={styles.appointmentHeader}>
+                      <div className={styles.patientName}>{appointment.patientName || 'Bệnh nhân không rõ'}</div>
+                      <div className={styles.appointmentStatus}>
+                        <Badge className={
+                          appointment.status === 'confirmed' ? styles.badgeConfirmed : 
+                          appointment.status === 'pending' ? styles.badgePending : 
+                          appointment.status === 'rejected' ? styles.badgeRejected : 
+                          styles.badgePending
+                        }>
+                          {appointment.status === 'confirmed' ? 'Đã xác nhận' : 
+                           appointment.status === 'pending' ? 'Đang chờ' : 
+                           appointment.status === 'rejected' ? 'Đã từ chối' : 
+                           'Đang chờ'}
+                        </Badge>
+                      </div>
+                    </div>
+                    <div className={styles.appointmentInfo}>
+                      <div className={styles.appointmentTime}>
+                        <Clock className={styles.clockIcon} />
+                        {new Date(appointment.appointmentDate).toLocaleDateString('vi-VN', { year: 'numeric', month: '2-digit', day: '2-digit' })} - {appointment.appointmentTime}
+                      </div>
+                      <div className={styles.appointmentType}>
+                        {appointment.appointmentType === 'online' ? <MessageSquare size={16} className={styles.typeIcon} /> : <UserCircle size={16} className={styles.typeIcon} />}
+                        {appointment.appointmentType || 'Trực tiếp'}
+                      </div>
+                    </div>
+                  </div>
+                  <div className={styles.appointmentActions}>
+                    <Button 
+                      onClick={() => {
+                        setEditModal({ open: true, appointment, mode: 'edit' });
+                      }}
+                      variant="outline"
+                      size="sm"
+                      className={styles.editButton}
+                    >
+                      <Edit className={styles.editIcon} />
+                      Sửa
+                    </Button>
+                    <Button 
+                      onClick={() => {
+                        setEditModal({ open: true, appointment, mode: 'confirm' });
+                      }}
+                      variant="default"
+                      size="sm"
+                      className={styles.confirmButton}
+                    >
+                      <Check className={styles.confirmIcon} />
+                      Xác nhận
+                    </Button>
+                    <Button 
+                      onClick={() => {
+                        setEditModal({ open: true, appointment, mode: 'reject' });
+                      }}
+                      variant="destructive"
+                      size="sm"
+                      className={styles.rejectButton}
+                    >
+                      <Trash2 className={styles.rejectIcon} />
+                      Từ chối
+                    </Button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+
+      
+      {/* Modal tạo lịch tư vấn */}
+      {showCreateModal && (
+        <div className={styles.modalOverlay}>
+          <div className={styles.modalContent}>
+            <div className={styles.modalHeader}>
+              <h3 className={styles.modalTitle}>Tạo lịch tư vấn mới</h3>
+              <button 
+                className={styles.closeButton}
+                onClick={() => setShowCreateModal(false)}
+              >
+                <X className={styles.closeIcon} />
+              </button>
+            </div>
+            <div className={styles.modalBody}>
+              <div className={styles.formGroup}>
+                <label className={styles.label}>Tên bệnh nhân</label>
+                <Input 
+                  value={newAppointment.patientName}
+                  onChange={(e) => setNewAppointment({ ...newAppointment, patientName: e.target.value })}
+                  className={styles.input}
+                  placeholder="Nhập tên bệnh nhân"
+                />
+              </div>
+              <div className={styles.formGroup}>
+                <label className={styles.label}>Ngày hẹn</label>
+                <Input 
+                  type="date"
+                  value={newAppointment.appointmentDate}
+                  onChange={(e) => setNewAppointment({ ...newAppointment, appointmentDate: e.target.value })}
+                  className={styles.input}
+                  min={new Date().toISOString().split('T')[0]} // Prevent selecting dates in the past
+                />
+              </div>
+              <div className={styles.formGroup}>
+                <label className={styles.label}>Giờ hẹn</label>
+                <Input 
+                  type="time"
+                  value={newAppointment.appointmentTime}
+                  onChange={(e) => setNewAppointment({ ...newAppointment, appointmentTime: e.target.value })}
+                  className={styles.input}
+                />
+              </div>
+              <div className={styles.formGroup}>
+                <label className={styles.label}>Loại hẹn</label>
+                <select 
+                  value={newAppointment.appointmentType}
+                  onChange={(e) => setNewAppointment({ ...newAppointment, appointmentType: e.target.value })}
+                  className={styles.select}
+                >
+                  <option value="Tư vấn trực tiếp">Tư vấn trực tiếp</option>
+                  <option value="Video call">Video call</option>
+                  <option value="Chat tư vấn">Chat tư vấn</option>
+                </select>
+              </div>
+              <div className={styles.formGroup}>
+                <label className={styles.label}>Lý do</label>
+                <Textarea 
+                  value={newAppointment.reason}
+                  onChange={(e) => setNewAppointment({ ...newAppointment, reason: e.target.value })}
+                  className={styles.textarea}
+                  placeholder="Nhập lý do hẹn khám"
+                />
+              </div>
+              {createError && <div className={styles.error}>{createError}</div>}
+            </div>
+            <div className={styles.modalFooter}>
+              <Button 
+                onClick={handleCreateAppointment}
+                variant="default"
+                className={styles.submitButton}
+                disabled={creating}
+              >
+                Tạo lịch hẹn
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
+      
+      {/* Modal xác nhận/từ chối/sửa lịch hẹn */}
+      {(editModal.open) && (
+        <div className={styles.modalOverlay}>
+          <div className={styles.modalContent}>
+            <div className={styles.modalHeader}>
+              <h3 className={styles.modalTitle}>
+                {editModal.mode === 'confirm' && 'Xác nhận lịch hẹn'}
+                {editModal.mode === 'reject' && 'Từ chối lịch hẹn'}
+                {editModal.mode === 'edit' && 'Sửa lịch hẹn'}
+              </h3>
+              <button 
+                className={styles.closeButton}
+                onClick={() => setEditModal({ open: false, appointment: null, mode: 'confirm' })}
+              >
+                <X className={styles.closeIcon} />
+              </button>
+            </div>
+            <div className={styles.modalBody}>
+              {editModal.mode !== 'edit' ? (
+                <div className={styles.confirmationMessage}>
+                  Bạn có chắc chắn muốn {editModal.mode === 'confirm' ? 'xác nhận' : 'từ chối'} lịch hẹn này?
+                </div>
+              ) : (
+                <>
+                  <div className={styles.formGroup}>
+                    <label className={styles.label}>Ngày hẹn</label>
+                    <Input 
+                      type="date"
+                      value={editForm.appointmentDate}
+                      onChange={(e) => setEditForm({ ...editForm, appointmentDate: e.target.value })}
+                      className={styles.input}
+                      min={new Date().toISOString().split('T')[0]} // Prevent selecting dates in the past
+                    />
+                  </div>
+                  <div className={styles.formGroup}>
+                    <label className={styles.label}>Giờ hẹn</label>
+                    <Input 
+                      type="time"
+                      value={editForm.appointmentTime}
+                      onChange={(e) => setEditForm({ ...editForm, appointmentTime: e.target.value })}
+                      className={styles.input}
+                    />
+                  </div>
+                  <div className={styles.formGroup}>
+                    <label className={styles.label}>Ghi chú</label>
+                    <Textarea 
+                      value={editForm.note}
+                      onChange={(e) => setEditForm({ ...editForm, note: e.target.value })}
+                      className={styles.textarea}
+                      placeholder="Nhập ghi chú cho lịch hẹn"
+                    />
+                  </div>
+                </>
+              )}
+              
+              {editError && <div className={styles.error}>{editError}</div>}
+            </div>
+            <div className={styles.modalFooter}>
+              {editModal.mode === 'edit' ? (
+                <Button 
+                  onClick={handleEdit}
+                  variant="default"
+                  className={styles.submitButton}
+                  disabled={editLoading}
+                >
+                  Lưu thay đổi
+                </Button>
+              ) : (
+                <Button 
+                  onClick={editModal.mode === 'confirm' ? () => handleConfirm(editModal.appointment) : () => handleReject(editModal.appointment)}
+                  variant={editModal.mode === 'confirm' ? "default" : "destructive"}
+                  className={styles.submitButton}
+                  disabled={editLoading}
+                >
+                  {editModal.mode === 'confirm' ? 'Xác nhận' : 'Từ chối'}
+                </Button>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
+// This file is replaced by ConsultationNew.jsx
+// Update your imports to use the new file
+export default Consultation;
