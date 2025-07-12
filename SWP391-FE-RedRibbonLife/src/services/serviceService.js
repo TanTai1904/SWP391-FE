@@ -35,16 +35,7 @@ const serviceService = {
     } catch (error) {
       throw error;
     }
-  },
-
-  updateService: async (id, data) => {
-    try {
-      const response = await api.put(`/services/${id}`, data);
-      return response.data;
-    } catch (error) {
-      throw error;
-    }
   }
 };
 
-export default serviceService;
+export default serviceService; 
