@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const BASE_URL = 'http://localhost:5130/api'; // Backend API URL
+const BASE_URL = 'http://localhost:1566/api'; // Backend API URL
 
 const api = axios.create({
   baseURL: BASE_URL,
@@ -35,4 +35,4 @@ api.interceptors.response.use(
   }
 );
 
-export default api; 
+export default api;
