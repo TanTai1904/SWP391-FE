@@ -119,7 +119,53 @@ const doctorService = {
       console.error('Error in updateDoctor:', error);
       throw error;
     }
+  },
+
+  // Xóa bác sĩ theo ID
+  deleteDoctor: async (doctorId) => {
+    try {
+      const response = await api.delete(`/Doctor/Delete/${doctorId}`);
+      return response.data;
+    } catch (error) {
+      console.error('Error in deleteDoctor:', error);
+      throw error;
+    }
+  },
+
+  // Tìm kiếm bác sĩ theo tên
+  searchDoctorsByName: async (name) => {
+    try {
+      const response = await api.get(`/Doctor/SearchByName`, {
+        params: { name }
+      });
+      return response.data;
+    } catch (error) {
+      console.error('Error in searchDoctorsByName:', error);
+      throw error;
+    }
+  },
+
+  // Cập nhật trạng thái bác sĩ (ví dụ: hoạt động/nghỉ phép)
+  updateDoctorStatus: async (doctorId, status) => {
+    try {
+      const response = await api.patch(`/Doctor/UpdateStatus/${doctorId}`, { status });
+      return response.data;
+    } catch (error) {
+      console.error('Error in updateDoctorStatus:', error);
+      throw error;
+    }
+  },
+
+  // Lấy danh sách bác sĩ theo phòng ban
+  getDoctorsByDepartment: async (departmentId) => {
+    try {
+      const response = await api.get(`/Doctor/GetByDepartment/${departmentId}`);
+      return response.data;
+    } catch (error) {
+      console.error('Error in getDoctorsByDepartment:', error);
+      throw error;
+    }
   }
 };
 
-export default doctorService; 
+export default doctorService;
