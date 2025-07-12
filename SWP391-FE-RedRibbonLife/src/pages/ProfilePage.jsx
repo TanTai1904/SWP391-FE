@@ -56,6 +56,20 @@ const ProfilePage = () => {
     return username ? username[0].toUpperCase() : 'U';
   };
 
+  // Helper function to mask email for privacy
+  const maskEmail = (email) => {
+    if (!email) return '';
+    const [name, domain] = email.split('@');
+    if (!name || !domain) return email;
+    return name[0] + '***' + name[name.length - 1] + '@' + domain;
+  };
+
+  // Helper function to mask phone number for privacy
+  const maskPhone = (phone) => {
+    if (!phone) return '';
+    return phone.replace(/(\d{3})\d{3,4}(\d{3})/, '$1***$2');
+  };
+
   if (!user) {
     return (
       <div>
@@ -73,7 +87,8 @@ const ProfilePage = () => {
 
   return (
     <div>
-      <Header />      <div className="profile-container">
+      <Header />
+      <div className="profile-container">
         <div className="profile-content">
           {/* Main Profile Section */}
           <div className="profile-main">
@@ -81,15 +96,25 @@ const ProfilePage = () => {
               <h1 className="profile-title">Hồ sơ Cá nhân</h1>
               <p className="profile-subtitle">Thông tin chi tiết tài khoản Red Ribbon Life</p>
             </div>
-            
             <div className="profile-card">
               <div className="profile-avatar">
                 <div className="avatar-circle">
                   {getUserInitials(user.full_name, user.username)}
                 </div>
                 <h3>{user.full_name || user.username || 'Người dùng'}</h3>
+                {/* Thêm trạng thái xác thực */}
+                <div className="profile-verified">
+                  {user.verified ? (
+                    <span className="verified-badge" title="Đã xác thực">
+                      <i className="fas fa-check-circle" style={{ color: '#4caf50' }}></i> Đã xác thực
+                    </span>
+                  ) : (
+                    <span className="unverified-badge" title="Chưa xác thực">
+                      <i className="fas fa-exclamation-circle" style={{ color: '#fbc02d' }}></i> Chưa xác thực
+                    </span>
+                  )}
+                </div>
               </div>
-
               <div className="profile-info">
                 <div className="info-group">
                   <div className="info-label">
@@ -100,24 +125,24 @@ const ProfilePage = () => {
                     {user.username || <span className="empty-value">Chưa cập nhật</span>}
                   </div>
                 </div>
-
                 <div className="info-group">
                   <div className="info-label">
                     <span className="icon">✉️</span>
                     Email
                   </div>
                   <div className="info-value email-value">
-                    {user.email || <span className="empty-value">Chưa cập nhật</span>}
+                    {/* Hiển thị email đã được che để bảo mật */}
+                    {user.email ? maskEmail(user.email) : <span className="empty-value">Chưa cập nhật</span>}
                   </div>
                 </div>
-
                 <div className="info-group">
                   <div className="info-label">
                     <span className="icon">📱</span>
                     Số điện thoại
                   </div>
                   <div className="info-value phone-value">
-                    {user.phone_number || <span className="empty-value">Chưa cập nhật</span>}
+                    {/* Hiển thị số điện thoại đã được che để bảo mật */}
+                    {user.phone_number ? maskPhone(user.phone_number) : <span className="empty-value">Chưa cập nhật</span>}
                   </div>
                 </div>
 
@@ -172,10 +197,21 @@ const ProfilePage = () => {
                     </span>
                   </div>
                 </div>
+                {/* Thêm ngày tham gia hệ thống nếu có */}
+                {user.created_at && (
+                  <div className="info-group">
+                    <div className="info-label">
+                      <span className="icon">🗓️</span>
+                      Ngày tham gia
+                    </div>
+                    <div className="info-value">
+                      {formatDate(user.created_at)}
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
           </div>
-
           {/* Website Info Sidebar */}
           <div className="profile-sidebar">
             <div className="website-info-card">
