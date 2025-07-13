@@ -1,67 +1,58 @@
 import api from './api';
 
-const authService = {  login: async (username, password) => {
-    try {
-      const response = await api.post('/auth/login', { username, password });
-      if (response.data.token) {
-        localStorage.setItem('token', response.data.token);
-        localStorage.setItem('username', response.data.username || username);
-        // Store additional user data if available
-        if (response.data.userRole) {
-          localStorage.setItem('userRole', response.data.userRole);
-        }
+// Helper to handle API requests
+const handleRequest = async (request) => {
+  try {
+    const response = await request;
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+const authService = {
+  login: async (username, password) => {
+    const data = await handleRequest(api.post('/auth/login', { username, password }));
+    if (data.token) {
+      localStorage.setItem('token', data.token);
+      localStorage.setItem('username', data.username || username);
+      if (data.userRole) {
+        localStorage.setItem('userRole', data.userRole);
       }
-      return response.data;
+    }
+    return data;
+  },
+
+  register: (userData) =>
+    handleRequest(api.post('/auth/register', userData)),
+
+  logout: async () => {
+    try {
+      await api.post('/auth/logout');
     } catch (error) {
-      throw error;
+      // Ignore API error, proceed to clear local storage
+    } finally {
+      localStorage.removeItem('token');
+      localStorage.removeItem('username');
+      localStorage.removeItem('userRole');
     }
   },
 
-  register: async (userData) => {
+  getCurrentUser: async () => {
     try {
-      const response = await api.post('/auth/register', userData);
-      return response.data;
+      return await handleRequest(api.get('/auth/me'));
     } catch (error) {
-      throw error;
-    }
-  },  logout: async () => {
-    try {
-      await api.post('/auth/logout');
-      localStorage.removeItem('token');
-      localStorage.removeItem('username');
-      localStorage.removeItem('userRole');
-    } catch (error) {
-      // Even if API call fails, remove local storage
-      localStorage.removeItem('token');
-      localStorage.removeItem('username');
-      localStorage.removeItem('userRole');
-    }
-  },getCurrentUser: async () => {
-    try {
-      const response = await api.get('/auth/me');
-      return response.data;
-    } catch (error) {
-      // If API call fails, check if we have data in localStorage
       const token = localStorage.getItem('token');
       const username = localStorage.getItem('username');
       const userRole = localStorage.getItem('userRole');
-      
       if (token && username) {
-        // Return basic user info from localStorage
-        return { 
-          username, 
-          userRole: userRole || 'Patient' 
-        };
+        return { username, userRole: userRole || 'Patient' };
       }
-      
-      // If no token or username, return null
       return null;
     }
   },
 
-  isAuthenticated: () => {
-    return !!localStorage.getItem('token');
-  }
+  isAuthenticated: () => !!localStorage.getItem('token'),
 };
 
-export default authService; 
+export default authService;

@@ -74,6 +74,12 @@ const NotificationsPage = () => {
       <Header />
       <div style={{ paddingTop: '100px', padding: '2rem' }}>
         <div style={{ maxWidth: '800px', margin: '0 auto' }}>
+          {/* Thêm lời chào */}
+          <div style={{ marginBottom: '2rem', textAlign: 'center' }}>
+            <h2>Xin chào, <span style={{ color: '#1976d2' }}>{user.username || user.name || 'bạn'}</span>!</h2>
+            <p>Đây là trung tâm thông báo cá nhân của bạn.</p>
+          </div>
+          
           <h1>🔔 Thông báo</h1>
           
           {/* Tabs */}

@@ -1,59 +1,33 @@
 import api from './api';
 
-const appointmentService = {
-  createAppointment: async (appointmentData) => {
-    try {
-      const response = await api.post('/appointments', appointmentData);
-      return response.data;
-    } catch (error) {
-      throw error;
-    }
-  },
-
-  getAppointmentById: async (id) => {
-    try {
-      const response = await api.get(`/appointments/${id}`);
-      return response.data;
-    } catch (error) {
-      throw error;
-    }
-  },
-
-  getUserAppointments: async () => {
-    try {
-      const response = await api.get('/appointments/user');
-      return response.data;
-    } catch (error) {
-      throw error;
-    }
-  },
-
-  updateAppointmentStatus: async (id, status) => {
-    try {
-      const response = await api.patch(`/appointments/${id}/status`, { status });
-      return response.data;
-    } catch (error) {
-      throw error;
-    }
-  },
-
-  cancelAppointment: async (id, reason) => {
-    try {
-      const response = await api.post(`/appointments/${id}/cancel`, { reason });
-      return response.data;
-    } catch (error) {
-      throw error;
-    }
-  },
-
-  rescheduleAppointment: async (id, newDateTime) => {
-    try {
-      const response = await api.post(`/appointments/${id}/reschedule`, { newDateTime });
-      return response.data;
-    } catch (error) {
-      throw error;
-    }
+// Helper to handle API requests
+const handleRequest = async (request) => {
+  try {
+    const response = await request;
+    return response.data;
+  } catch (error) {
+    throw error;
   }
 };
 
-export default appointmentService; 
+const appointmentService = {
+  createAppointment: (appointmentData) =>
+    handleRequest(api.post('/appointments', appointmentData)),
+
+  getAppointmentById: (id) =>
+    handleRequest(api.get(`/appointments/${id}`)),
+
+  getUserAppointments: () =>
+    handleRequest(api.get('/appointments/user')),
+
+  updateAppointmentStatus: (id, status) =>
+    handleRequest(api.patch(`/appointments/${id}/status`, { status })),
+
+  cancelAppointment: (id, reason) =>
+    handleRequest(api.post(`/appointments/${id}/cancel`, { reason })),
+
+  rescheduleAppointment: (id, newDateTime) =>
+    handleRequest(api.post(`/appointments/${id}/reschedule`, { newDateTime })),
+};
+
+export default appointmentService;

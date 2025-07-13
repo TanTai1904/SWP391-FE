@@ -173,12 +173,104 @@ const services = [
   }
 ];
 
+const ServicesStats = () => (
+  <section className="services-stats">
+    <div className="services-container">
+      <div className="stats-grid">
+        <div className="stat-item">
+          <div className="stat-number">12+</div>
+          <div className="stat-label">Dịch vụ chuyên biệt</div>
+        </div>
+        <div className="stat-item">
+          <div className="stat-number">5000+</div>
+          <div className="stat-label">Bệnh nhân đã điều trị</div>
+        </div>
+        <div className="stat-item">
+          <div className="stat-number">50+</div>
+          <div className="stat-label">Bác sĩ chuyên môn</div>
+        </div>
+        <div className="stat-item">
+          <div className="stat-number">98%</div>
+          <div className="stat-label">Tỷ lệ hài lòng</div>
+        </div>
+      </div>
+    </div>
+  </section>
+);
+
+const ServicesFilter = ({ categories, selected, setSelected }) => (
+  <section className="services-filter">
+    <div className="filter-container">
+      <h2 className="filter-title">Lọc theo danh mục dịch vụ</h2>
+      <div className="filter-buttons">
+        {categories.map(category => (
+          <button
+            key={category}
+            className={`filter-btn ${selected === category ? 'active' : ''}`}
+            onClick={() => setSelected(category)}
+          >
+            {category}
+          </button>
+        ))}
+      </div>
+    </div>
+  </section>
+);
+
+const ServiceCard = ({ service }) => (
+  <div className="service-detail-card">
+    <div className="service-icon">
+      <i className={`fas fa-${service.icon}`}></i>
+    </div>
+    <div className="service-category-tag">{service.category}</div>
+    <h2>{service.title}</h2>
+    <p>{service.description}</p>
+    <ul className="service-features">
+      {service.features.map((feature, idx) => (
+        <li key={idx}>{feature}</li>
+      ))}
+    </ul>
+    <Link to="/appointment" className="service-cta">
+      <i className="fas fa-calendar-plus"></i>
+      Đặt lịch ngay
+    </Link>
+  </div>
+);
+
+const ServicesGrid = ({ services }) => (
+  <section className="services-grid">
+    {services.map(service => (
+      <ServiceCard key={service.id} service={service} />
+    ))}
+  </section>
+);
+
+const ContactCTA = () => (
+  <section className="contact-cta">
+    <div className="contact-cta-content">
+      <h2>Bạn cần tư vấn thêm?</h2>
+      <p>Đội ngũ chuyên gia của chúng tôi luôn sẵn sàng hỗ trợ bạn với dịch vụ tư vấn chuyên nghiệp và bảo mật.</p>
+      <div className="cta-buttons">
+        <Link to="/appointment" className="btn-primary-cta">
+          <i className="fas fa-calendar-plus"></i>
+          Đặt lịch khám
+        </Link>
+        <Link to="/contact" className="btn-primary-cta">
+          <i className="fas fa-phone"></i>
+          Liên hệ tư vấn
+        </Link>
+      </div>
+    </div>
+  </section>
+);
+
 const ServicesPage = () => {
   const [selectedCategory, setSelectedCategory] = useState("Tất cả");
+  const filteredServices =
+    selectedCategory === "Tất cả"
+      ? services
+      : services.filter(service => service.category === selectedCategory);
 
-  const filteredServices = selectedCategory === "Tất cả"
-    ? services
-    : services.filter(service => service.category === selectedCategory);
   return (
     <div className="services-page">
       <Header />
@@ -188,94 +280,21 @@ const ServicesPage = () => {
           <div className="services-container">
             <div className="services-hero-content">
               <h1>Dịch vụ Điều trị HIV</h1>
-              <p>Cung cấp dịch vụ điều trị HIV toàn diện, chuyên nghiệp và bảo mật theo tiêu chuẩn quốc tế</p>
+              <p>
+                Cung cấp dịch vụ điều trị HIV toàn diện, chuyên nghiệp và bảo mật theo tiêu chuẩn quốc tế
+              </p>
             </div>
           </div>
         </section>
-
-        {/* Stats Section */}
-        <section className="services-stats">
-          <div className="services-container">
-            <div className="stats-grid">
-              <div className="stat-item">
-                <div className="stat-number">12+</div>
-                <div className="stat-label">Dịch vụ chuyên biệt</div>
-              </div>
-              <div className="stat-item">
-                <div className="stat-number">5000+</div>
-                <div className="stat-label">Bệnh nhân đã điều trị</div>
-              </div>
-              <div className="stat-item">
-                <div className="stat-number">50+</div>
-                <div className="stat-label">Bác sĩ chuyên môn</div>
-              </div>
-              <div className="stat-item">
-                <div className="stat-number">98%</div>
-                <div className="stat-label">Tỷ lệ hài lòng</div>
-              </div>
-            </div>
-          </div>
-        </section>
-
+        <ServicesStats />
         <div className="services-container">
-          {/* Filter Section */}
-          <section className="services-filter">
-            <div className="filter-container">
-              <h2 className="filter-title">Lọc theo danh mục dịch vụ</h2>
-              <div className="filter-buttons">
-                {serviceCategories.map(category => (
-                  <button
-                    key={category}
-                    className={`filter-btn ${selectedCategory === category ? 'active' : ''}`}
-                    onClick={() => setSelectedCategory(category)}
-                  >
-                    {category}
-                  </button>
-                ))}
-              </div>
-            </div>
-          </section>
-
-          {/* Services Grid */}
-          <section className="services-grid">
-            {filteredServices.map(service => (
-              <div key={service.id} className="service-detail-card">
-                <div className="service-icon">
-                  <i className={`fas fa-${service.icon}`}></i>
-                </div>
-                <div className="service-category-tag">{service.category}</div>
-                <h2>{service.title}</h2>
-                <p>{service.description}</p>
-                <ul className="service-features">
-                  {service.features.map((feature, index) => (
-                    <li key={index}>{feature}</li>
-                  ))}
-                </ul>
-                <Link to="/appointment" className="service-cta">
-                  <i className="fas fa-calendar-plus"></i>
-                  Đặt lịch ngay
-                </Link>
-              </div>
-            ))}
-          </section>
-
-          {/* Contact CTA */}
-          <section className="contact-cta">
-            <div className="contact-cta-content">
-              <h2>Bạn cần tư vấn thêm?</h2>
-              <p>Đội ngũ chuyên gia của chúng tôi luôn sẵn sàng hỗ trợ bạn với dịch vụ tư vấn chuyên nghiệp và bảo mật.</p>
-              <div className="cta-buttons">
-                <Link to="/appointment" className="btn-primary-cta">
-                  <i className="fas fa-calendar-plus"></i>
-                  Đặt lịch khám
-                </Link>
-                <Link to="/contact" className="btn-primary-cta">
-                  <i className="fas fa-phone"></i>
-                  Liên hệ tư vấn
-                </Link>
-              </div>
-            </div>
-          </section>
+          <ServicesFilter
+            categories={serviceCategories}
+            selected={selectedCategory}
+            setSelected={setSelectedCategory}
+          />
+          <ServicesGrid services={filteredServices} />
+          <ContactCTA />
         </div>
       </main>
       <Footer />
@@ -283,4 +302,4 @@ const ServicesPage = () => {
   );
 };
 
-export default ServicesPage; 
+export default ServicesPage;
