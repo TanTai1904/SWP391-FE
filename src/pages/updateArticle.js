@@ -205,20 +205,6 @@ const UpdateArticle = () => {
                 />
               </div>
 
-              <div className="flex items-center">
-                <input
-                  type="checkbox"
-                  id="isActive"
-                  name="isActive"
-                  checked={formData.isActive}
-                  onChange={handleChange}
-                  className="h-4 w-4 text-red-600 focus:ring-red-500 border-gray-300 rounded"
-                />
-                <label htmlFor="isActive" className="ml-2 block text-sm text-gray-900">
-                  Kích hoạt bài viết
-                </label>
-              </div>
-
               <div className="flex justify-end space-x-4">
                 <button
                   type="button"

@@ -124,11 +124,12 @@ const CreateTreatment = () => {
       if (response.data.status) {
         // Send email notification
         try {
+          const treatmentId = response.data.data.id || response.data.data.treatmentId;
+          console.log('Treatment created with ID:', treatmentId);
+          
           const emailResponse = await axios.post(
             'http://localhost:8080/api/Email/SendTreatmentCreatedEmail',
-            {
-              treatmentId: response.data.data.id
-            },
+            { treatmentId: parseInt(treatmentId) },
             {
               headers: {
                 'Content-Type': 'application/json',
@@ -142,6 +143,7 @@ const CreateTreatment = () => {
           }
         } catch (emailError) {
           console.error('Error sending email notification:', emailError);
+          // Don't show error to user, just log it
         }
 
         // Update appointment status to Complete

@@ -49,10 +49,13 @@ const AppointmentsPage = () => {
           }
         });
         if (response.data.status) {
-          setTestTypes(response.data.data);
+          // Lọc chỉ lấy các test type có isActive = true
+          const activeTestTypes = response.data.data.filter(type => type.isActive);
+          setTestTypes(activeTestTypes);
         }
       } catch (error) {
         console.error('Error fetching test types:', error);
+        toast.error('Không thể tải danh sách loại xét nghiệm');
       }
     };
 
@@ -469,7 +472,7 @@ const AppointmentsPage = () => {
                 </div>
 
                 {/* Test Type Selection for Medication */}
-                {appointmentType === 'medication' && (
+                {appointmentType === 'medication' && testTypes.length > 0 && (
                   <div className="bg-white rounded-xl shadow-md p-6">
                     <h3 className="text-xl font-bold text-gray-900 mb-6">Chọn loại xét nghiệm</h3>
                     <div className="grid gap-4">
@@ -483,9 +486,24 @@ const AppointmentsPage = () => {
                           }`}
                           onClick={() => setSelectedTestType(testType.testTypeId)}
                         >
-                          {testType.testTypeName}
+                          <div className="flex flex-col">
+                            <span className="text-lg">{testType.testTypeName}</span>
+                            <span className="text-sm opacity-75 mt-1">
+                              Đơn vị: {testType.unit} | Giá trị bình thường: {testType.normalRange}
+                            </span>
+                          </div>
                         </button>
                       ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Show message when no active test types */}
+                {appointmentType === 'medication' && testTypes.length === 0 && (
+                  <div className="bg-white rounded-xl shadow-md p-6">
+                    <div className="text-center text-gray-500">
+                      <p>Hiện tại không có loại xét nghiệm nào khả dụng.</p>
+                      <p>Vui lòng thử lại sau hoặc liên hệ với nhân viên để được hỗ trợ.</p>
                     </div>
                   </div>
                 )}

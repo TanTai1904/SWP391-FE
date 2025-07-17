@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { FiEdit2, FiTrash2, FiPlus } from 'react-icons/fi';
 import { useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
 
 const CategoryManager = () => {
   const [categories, setCategories] = useState([]);
@@ -22,7 +23,9 @@ const CategoryManager = () => {
       setLoading(true);
       const response = await axios.get('http://localhost:8080/api/Category/GetAll');
       if (response.data.status) {
-        setCategories(response.data.data);
+        // Filter to show only active categories
+        const activeCategories = response.data.data.filter(category => category.isActive === true);
+        setCategories(activeCategories);
       }
     } catch (error) {
       console.error('Error fetching categories:', error);
@@ -42,10 +45,28 @@ const CategoryManager = () => {
   const handleDelete = async (categoryId) => {
     if (window.confirm('Bạn có chắc chắn muốn xóa danh mục này?')) {
       try {
-        await axios.delete(`http://localhost:8080/api/Category/Delete/${categoryId}`);
+        const token = localStorage.getItem('token');
+        // Find the category object
+        const categoryToUpdate = categories.find(cat => cat.categoryId === categoryId);
+        if (!categoryToUpdate) {
+          toast.error('Không tìm thấy thông tin danh mục');
+          return;
+        }
+
+        await axios.put(`http://localhost:8080/api/Category/Update`, {
+          categoryId: categoryId,
+          categoryName: categoryToUpdate.categoryName, // Include the existing category name
+          isActive: false
+        }, {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+        toast.success('Xóa danh mục thành công');
         fetchCategories();
       } catch (error) {
         console.error('Error deleting category:', error);
+        toast.error('Có lỗi xảy ra khi xóa danh mục');
       }
     }
   };

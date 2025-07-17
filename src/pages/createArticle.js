@@ -34,7 +34,9 @@ const CreateArticle = () => {
           }
         });
         if (response.data.status) {
-          setCategories(response.data.data);
+          // Filter to show only active categories
+          const activeCategories = response.data.data.filter(category => category.isActive === true);
+          setCategories(activeCategories);
         }
       } catch (err) {
         console.error('Error fetching categories:', err);

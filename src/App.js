@@ -24,6 +24,11 @@ import CreateRegimens from './pages/createRegimens';
 import ChooseRegiment from './pages/chooseRegiment';
 import ArticlesPage from './pages/ArticlesPage';
 import CategoryPage from './pages/CategoryPage';
+import UpdateCertificate from './pages/updateCertificate';
+import CertificateManagement from './pages/certificateManagement';
+import CreateCertificate from './pages/createCertificate';
+import ARVComponentManager from './pages/arvComponentManager';
+import UpdateARVComponent from './pages/updateARVComponent';
 import PrivateRoute from './components/PrivateRoute';
 import Header from './components/Layout/Header';
 import Footer from './components/Layout/Footer';
@@ -31,6 +36,21 @@ import { AuthProvider } from './contexts/AuthContext';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import './App.css';
+import CreateComponent from './pages/createComponent';
+import TestTypeManager from './pages/testTypeManager';
+import CreateTestType from './pages/createTestType';
+import UpdateTestType from './pages/updateTestType';
+import ManagerPage from './pages/managerPage';
+import CreateManager from './pages/createManager';
+import UpdateManager from './pages/updateManager';
+import DoctorManager from './pages/doctormanager';
+import CreateDoctor from './pages/createDoctor';
+import UpdateDoctor from './pages/updateDoctor';
+import StaffManager from './pages/staffManager';
+import CreateStaff from './pages/createStaff';
+import UpdateStaff from './pages/updateStaff';
+import TestResultManager from './pages/testResultManager';
+import UpdateTestResult from './pages/updateTestResult';
 
 function App() {
   return (
@@ -198,6 +218,174 @@ function App() {
                         element={
                           <PrivateRoute>
                             <UpdateArticle />
+                          </PrivateRoute>
+                        }
+                      />
+                      <Route
+                        path="/certificate-management"
+                        element={
+                          <PrivateRoute>
+                            <CertificateManagement />
+                          </PrivateRoute>
+                        }
+                      />
+                      <Route
+                        path="/certificate/create"
+                        element={
+                          <PrivateRoute>
+                            <CreateCertificate />
+                          </PrivateRoute>
+                        }
+                      />
+                      <Route
+                        path="/certificate/update/:id"
+                        element={
+                          <PrivateRoute>
+                            <UpdateCertificate />
+                          </PrivateRoute>
+                        }
+                      />
+                      <Route
+                        path="/ARVcomponents-management"
+                        element={
+                          <PrivateRoute>
+                            <ARVComponentManager />
+                          </PrivateRoute>
+                        }
+                      />
+                      <Route
+                        path="/ARVcomponents"
+                        element={
+                          <PrivateRoute>
+                            <ARVComponentManager />
+                          </PrivateRoute>
+                        }
+                      />
+                      <Route
+                        path="/ARVcomponents/create"
+                        element={
+                          <PrivateRoute>
+                            <CreateComponent />
+                          </PrivateRoute>
+                        }
+                      />
+                      <Route
+                        path="/ARVcomponents/update/:componentId"
+                        element={
+                          <PrivateRoute>
+                            <UpdateARVComponent />
+                          </PrivateRoute>
+                        }
+                      />
+                      <Route
+                        path="/testType-management"
+                        element={
+                          <PrivateRoute>
+                            <TestTypeManager />
+                          </PrivateRoute>
+                        }
+                      />
+                      <Route
+                        path="/test-types/create"
+                        element={
+                          <PrivateRoute>
+                            <CreateTestType />
+                          </PrivateRoute>
+                        }
+                      />
+                      <Route
+                        path="/test-types/update/:id"
+                        element={
+                          <PrivateRoute>
+                            <UpdateTestType />
+                          </PrivateRoute>
+                        }
+                      />
+                      <Route
+                        path="/manager-management"
+                        element={
+                          <PrivateRoute>
+                            <ManagerPage />
+                          </PrivateRoute>
+                        }
+                      />
+                      <Route
+                        path="/managers/create"
+                        element={
+                          <PrivateRoute>
+                            <CreateManager />
+                          </PrivateRoute>
+                        }
+                      />
+                      <Route
+                        path="/managers/update/:id"
+                        element={
+                          <PrivateRoute>
+                            <UpdateManager />
+                          </PrivateRoute>
+                        }
+                      />
+                      <Route
+                        path="/doctors-management"
+                        element={
+                          <PrivateRoute>
+                            <DoctorManager />
+                          </PrivateRoute>
+                        }
+                      />
+                      <Route
+                        path="/doctors/create"
+                        element={
+                          <PrivateRoute>
+                            <CreateDoctor />
+                          </PrivateRoute>
+                        }
+                      />
+                      <Route
+                        path="/doctors/update/:id"
+                        element={
+                          <PrivateRoute>
+                            <UpdateDoctor />
+                          </PrivateRoute>
+                        }
+                      />
+                      <Route
+                        path="/staff-management"
+                        element={
+                          <PrivateRoute>
+                            <StaffManager />
+                          </PrivateRoute>
+                        }
+                      />
+                      <Route
+                        path="/staffs/create"
+                        element={
+                          <PrivateRoute>
+                            <CreateStaff />
+                          </PrivateRoute>
+                        }
+                      />
+                      <Route
+                        path="/staffs/update/:id"
+                        element={
+                          <PrivateRoute>
+                            <UpdateStaff />
+                          </PrivateRoute>
+                        }
+                      />
+                      <Route
+                        path="/testResult-management"
+                        element={
+                          <PrivateRoute>
+                            <TestResultManager />
+                          </PrivateRoute>
+                        }
+                      />
+                      <Route
+                        path="/test-results/update/:id"
+                        element={
+                          <PrivateRoute>
+                            <UpdateTestResult />
                           </PrivateRoute>
                         }
                       />

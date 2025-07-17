@@ -84,6 +84,7 @@ const UserMenu = ({ user, onLogout }) => {
               Danh sách lịch hẹn
             </Link>
           )}
+          {/* Doctor */}
           {user?.userRole === 'Doctor' && (
             <Link
               to="/appointments/management"
@@ -93,13 +94,24 @@ const UserMenu = ({ user, onLogout }) => {
               Danh sách lịch hẹn
             </Link>
           )}
+          {user?.userRole === 'Doctor' && (
+            <Link
+              to="/testResult-management"
+              className="block px-4 py-2 text-sm text-gray-700 hover:bg-red-50 hover:text-red-600"
+              onClick={() => setIsOpen(false)}
+            >
+              Quản lý kết quả khám
+            </Link>
+          )}
+          {/* Admin */}
           {user?.userRole === 'Admin' && (
             <Link
               to="/categories"
               className="block px-4 py-2 text-sm text-gray-700 hover:bg-red-50 hover:text-red-600"
               onClick={() => setIsOpen(false)}
+              sty
             >
-              Quản lý danh mục
+              Quản lý danh mục bài viết
             </Link>
           )}
           {user?.userRole === 'Admin' && (
@@ -111,13 +123,68 @@ const UserMenu = ({ user, onLogout }) => {
               Quản lý bài viết
             </Link>
           )}
+          {user?.userRole === 'Admin' && (
+            <Link
+              to="/certificate-management"
+              className="block px-4 py-2 text-sm text-gray-700 hover:bg-red-50 hover:text-red-600"
+              onClick={() => setIsOpen(false)}
+            >
+              Quản lý chứng chỉ bác sĩ
+            </Link>
+          )}
+          {user?.userRole === 'Admin' && (
+            <Link
+              to="/ARVcomponents-management"
+              className="block px-4 py-2 text-sm text-gray-700 hover:bg-red-50 hover:text-red-600"
+              onClick={() => setIsOpen(false)}
+            >
+              Quản lý thành phần
+            </Link>
+          )}
+          {user?.userRole === 'Admin' && (
+            <Link
+              to="/testType-management"
+              className="block px-4 py-2 text-sm text-gray-700 hover:bg-red-50 hover:text-red-600"
+              onClick={() => setIsOpen(false)}
+            >
+              Quản lý loại khám
+            </Link>
+          )}
+          {/* {user?.userRole === 'Admin' && (
+            <Link
+              to="/manager-management"
+              className="block px-4 py-2 text-sm text-gray-700 hover:bg-red-50 hover:text-red-600"
+              onClick={() => setIsOpen(false)}
+            >
+              Quản lý Manager
+            </Link>
+          )} */}
+          {user?.userRole === 'Admin' && (
+            <Link
+              to="/doctors-management"
+              className="block px-4 py-2 text-sm text-gray-700 hover:bg-red-50 hover:text-red-600"
+              onClick={() => setIsOpen(false)}
+            >
+              Quản lý bác sĩ
+            </Link>
+          )}
+          {user?.userRole === 'Admin' && (
+            <Link
+              to="/staff-management"
+              className="block px-4 py-2 text-sm text-gray-700 hover:bg-red-50 hover:text-red-600"
+              onClick={() => setIsOpen(false)}
+            >
+              Quản lý nhân viên
+            </Link>
+          )}
+          {/* Staff */}
           {user?.userRole === 'Staff' && (
             <Link
               to="/categories"
               className="block px-4 py-2 text-sm text-gray-700 hover:bg-red-50 hover:text-red-600"
               onClick={() => setIsOpen(false)}
             >
-              Quản lý danh mục
+              Quản lý danh mục bài viết
             </Link>
           )}
           {user?.userRole === 'Staff' && (
@@ -129,13 +196,41 @@ const UserMenu = ({ user, onLogout }) => {
               Quản lý bài viết
             </Link>
           )}
+          {user?.userRole === 'Staff' && (
+            <Link
+              to="/certificate-management"
+              className="block px-4 py-2 text-sm text-gray-700 hover:bg-red-50 hover:text-red-600"
+              onClick={() => setIsOpen(false)}
+            >
+              Quản lý chứng chỉ bác sĩ
+            </Link>
+          )}
+          {user?.userRole === 'Staff' && (
+            <Link
+              to="/ARVcomponents-management"
+              className="block px-4 py-2 text-sm text-gray-700 hover:bg-red-50 hover:text-red-600"
+              onClick={() => setIsOpen(false)}
+            >
+              Quản lý thành phần
+            </Link>
+          )}
+          {user?.userRole === 'Staff' && (
+            <Link
+              to="/testType-management"
+              className="block px-4 py-2 text-sm text-gray-700 hover:bg-red-50 hover:text-red-600"
+              onClick={() => setIsOpen(false)}
+            >
+              Quản lý loại khám
+            </Link>
+          )}
+          {/* Manager */}
           {user?.userRole === 'Manager' && (
             <Link
               to="/categories"
               className="block px-4 py-2 text-sm text-gray-700 hover:bg-red-50 hover:text-red-600"
               onClick={() => setIsOpen(false)}
             >
-              Quản lý danh mục
+              Quản lý danh mục bài viết
             </Link>
           )}
           {user?.userRole === 'Manager' && (
@@ -145,6 +240,33 @@ const UserMenu = ({ user, onLogout }) => {
               onClick={() => setIsOpen(false)}
             >
               Quản lý bài viết 
+            </Link>
+          )}
+          {user?.userRole === 'Manager' && (
+            <Link
+              to="/certificate-management"
+              className="block px-4 py-2 text-sm text-gray-700 hover:bg-red-50 hover:text-red-600"
+              onClick={() => setIsOpen(false)}
+            >
+              Quản lý chứng chỉ bác sĩ
+            </Link>
+          )}
+          {user?.userRole === 'Manager' && (
+            <Link
+              to="/ARVcomponents-management"
+              className="block px-4 py-2 text-sm text-gray-700 hover:bg-red-50 hover:text-red-600"
+              onClick={() => setIsOpen(false)}
+            >
+              Quản lý thành phần
+            </Link>
+          )}
+          {user?.userRole === 'Manager' && (
+            <Link
+              to="/testType-management"
+              className="block px-4 py-2 text-sm text-gray-700 hover:bg-red-50 hover:text-red-600"
+              onClick={() => setIsOpen(false)}
+            >
+              Quản lý loại khám
             </Link>
           )}
           <button

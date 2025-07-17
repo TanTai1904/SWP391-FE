@@ -42,7 +42,9 @@ const CreateRegimens = () => {
       });
 
       if (response.data.status) {
-        setComponents(response.data.data);
+        // Lọc chỉ lấy các component có isActive là true
+        const activeComponents = response.data.data.filter(component => component.isActive);
+        setComponents(activeComponents);
       } else {
         toast.error('Không thể tải danh sách thuốc');
       }
@@ -194,7 +196,11 @@ const CreateRegimens = () => {
                     >
                       <option value="">Chọn thuốc</option>
                       {components.map(comp => (
-                        <option key={comp.componentId} value={comp.componentId}>
+                        <option 
+                          key={comp.componentId} 
+                          value={comp.componentId}
+                          title={comp.description} // Thêm tooltip hiển thị mô tả khi hover
+                        >
                           {comp.componentName}
                         </option>
                       ))}

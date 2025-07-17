@@ -9,7 +9,8 @@ const UpdateCategory = () => {
   const { id } = useParams(); // Lấy ID từ URL
   const [formData, setFormData] = useState({
     categoryId: '',
-    categoryName: ''
+    categoryName: '',
+    isActive: true
   });
   const [loading, setLoading] = useState(false);
   const [initialLoading, setInitialLoading] = useState(true);
@@ -36,7 +37,8 @@ const UpdateCategory = () => {
       if (response.data.status) {
         setFormData({
           categoryId: response.data.data.categoryId,
-          categoryName: response.data.data.categoryName
+          categoryName: response.data.data.categoryName,
+          isActive: response.data.data.isActive
         });
       } else {
         toast.error('Không tìm thấy thông tin danh mục');
@@ -70,7 +72,8 @@ const UpdateCategory = () => {
       const response = await axios.put('http://localhost:8080/api/Category/Update', 
         {
           categoryId: formData.categoryId,
-          categoryName: formData.categoryName
+          categoryName: formData.categoryName,
+          isActive: formData.isActive
         },
         {
           headers: {

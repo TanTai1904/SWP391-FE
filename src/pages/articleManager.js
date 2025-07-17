@@ -191,13 +191,13 @@ const ArticleManager = () => {
                             <FiCheck className="w-5 h-5" />
                           )}
                         </button>
-                        {/* <button
+                        <button
                           onClick={() => handleDelete(article.articleId)}
                           className="flex items-center text-red-600 hover:text-red-900 transition-colors duration-200"
                           title="Xóa"
                         >
                           <FiTrash2 className="w-5 h-5" />
-                        </button> */}
+                        </button>
                       </div>
                     </td>
                   </tr>

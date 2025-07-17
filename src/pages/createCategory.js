@@ -7,7 +7,8 @@ import { toast } from 'react-toastify';
 const CreateCategory = () => {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
-    categoryName: ''
+    categoryName: '',
+    isActive: true
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -29,7 +30,8 @@ const CreateCategory = () => {
 
       const response = await axios.post('http://localhost:8080/api/Category/Create', 
         {
-          categoryName: formData.categoryName
+          categoryName: formData.categoryName,
+          isActive: true
         },
         {
           headers: {
