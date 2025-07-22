@@ -4,6 +4,8 @@ import { Link } from 'react-router-dom';
 import CategoryList from '../components/HomePage/CategoryList';
 import ArticleList from '../components/HomePage/ArticleList';
 
+const API_URL = `${process.env.REACT_APP_API_URL}/api`;
+
 const HomePage = () => {
   const [categories, setCategories] = useState([]);
   const [articles, setArticles] = useState([]);
@@ -14,8 +16,8 @@ const HomePage = () => {
     const fetchData = async () => {
       try {
         const [categoriesResponse, articlesResponse] = await Promise.all([
-          axios.get('http://localhost:8080/api/Category/GetAll'),
-          axios.get('http://localhost:8080/api/Article/GetAll')
+          axios.get(`${API_URL}/Category/GetAll`),
+          axios.get(`${API_URL}/Article/GetAll`)
         ]);
 
         const categoriesData = categoriesResponse.data?.data || [];

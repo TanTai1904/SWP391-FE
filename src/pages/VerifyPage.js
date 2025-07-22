@@ -8,6 +8,7 @@ const VerifyPage = () => {
   const [verifyCode, setVerifyCode] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const API_URL = `${process.env.REACT_APP_API_URL}/api`;
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -15,7 +16,7 @@ const VerifyPage = () => {
     setLoading(true);
 
     try {
-      const response = await fetch('http://localhost:8080/api/Email/VerifyPatient', {
+      const response = await fetch(`${API_URL}/Email/VerifyPatient`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -110,7 +111,7 @@ const VerifyPage = () => {
           <button
             onClick={() => {
               // Gửi lại mã xác thực
-              fetch('http://localhost:8080/api/Email/SendEmail', {
+              fetch(`${API_URL}/Email/SendEmail`, {
                 method: 'POST',
                 headers: {
                   'Content-Type': 'application/json',

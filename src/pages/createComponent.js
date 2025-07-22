@@ -13,6 +13,7 @@ const CreateComponent = () => {
     description: '',
     isActive: true
   });
+  const API_URL = process.env.REACT_APP_API_URL;
 
   const validateForm = () => {
     const errors = {};
@@ -58,7 +59,7 @@ const CreateComponent = () => {
       console.log('Sending create data:', createData);
 
       const response = await axios.post(
-        'http://localhost:8080/api/ARVComponents/Create',
+        `${API_URL}/api/ARVComponents/Create`,
         createData,
         {
           headers: {

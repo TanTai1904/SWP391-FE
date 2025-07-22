@@ -16,6 +16,7 @@ const CreateManager = () => {
     gender: 'Male',
     address: ''
   });
+  const API_URL = process.env.REACT_APP_API_URL;
 
   const [errors, setErrors] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -86,7 +87,7 @@ const CreateManager = () => {
     try {
       const token = localStorage.getItem('token');
       const response = await axios.post(
-        'http://localhost:8080/api/Manager/Create',
+        `${API_URL}/api/Manager/Create`,
         formData,
         {
           headers: {

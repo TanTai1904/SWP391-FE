@@ -15,6 +15,7 @@ const UpdateAppointmentPage = () => {
   const [selectedDoctor, setSelectedDoctor] = useState(null);
   const [searchingDoctors, setSearchingDoctors] = useState(false);
   const [hasSearched, setHasSearched] = useState(false);
+  const API_URL = process.env.REACT_APP_API_URL;
 
   // Thêm object để map status từ tiếng Anh sang tiếng Việt
   const statusMapping = {
@@ -64,7 +65,7 @@ const UpdateAppointmentPage = () => {
 
   const fetchAppointment = async () => {
     try {
-      const response = await axios.get(`http://localhost:8080/api/Appointment/GetByID/${id}`, {
+      const response = await axios.get(`${API_URL}/api/Appointment/GetByID/${id}`, {
         headers: {
           'Authorization': `Bearer ${getToken()}`
         }
@@ -105,7 +106,7 @@ const UpdateAppointmentPage = () => {
       const formattedDate = formatDate(searchDate);
       const formattedTime = formatTime(searchTime);
       
-      const response = await axios.get(`http://localhost:8080/api/Appointment/GetAvailableDoctors`, {
+      const response = await axios.get(`${API_URL}/api/Appointment/GetAvailableDoctors`, {
         params: {
           appointmentDate: formattedDate,
           appointmentTime: formattedTime
@@ -151,7 +152,7 @@ const UpdateAppointmentPage = () => {
       };
 
       const response = await axios.put(
-        `http://localhost:8080/api/Appointment/Update`,
+        `${API_URL}/api/Appointment/Update`,
         updateData,
         {
           headers: {

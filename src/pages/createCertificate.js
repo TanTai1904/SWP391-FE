@@ -15,6 +15,7 @@ const CreateCertificate = () => {
     issueDate: '',
     expiryDate: ''
   });
+  const API_URL = process.env.REACT_APP_API_URL;
 
   useEffect(() => {
     fetchDoctors();
@@ -23,7 +24,7 @@ const CreateCertificate = () => {
   const fetchDoctors = async () => {
     try {
       const token = localStorage.getItem('token');
-      const response = await axios.get('http://localhost:8080/api/Doctor/GetAll', {
+      const response = await axios.get(`${API_URL}/api/Doctor/GetAll`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -52,7 +53,7 @@ const CreateCertificate = () => {
     try {
       const token = localStorage.getItem('token');
       
-      const response = await axios.post('http://localhost:8080/api/DoctorCertificate/Create',
+      const response = await axios.post(`${API_URL}/api/DoctorCertificate/Create`,
         {
           doctorId: parseInt(formData.doctorId),
           certificateName: formData.certificateName,

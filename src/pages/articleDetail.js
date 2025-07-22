@@ -7,12 +7,13 @@ const ArticleDetail = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const { id } = useParams();
+  const API_URL = process.env.REACT_APP_API_URL;
 
   useEffect(() => {
     const fetchArticle = async () => {
       try {
         setLoading(true);
-        const response = await axios.get(`http://localhost:8080/api/Article/GetByID/${id}`);
+        const response = await axios.get(`${API_URL}/api/Article/GetByID/${id}`);
         if (response.data.status) {
           setArticle(response.data.data);
         } else {

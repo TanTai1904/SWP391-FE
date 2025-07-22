@@ -13,6 +13,7 @@ const CertificateManagement = () => {
   const [certificates, setCertificates] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const API_URL = process.env.REACT_APP_API_URL;
 
   useEffect(() => {
     fetchCertificates();
@@ -28,7 +29,7 @@ const CertificateManagement = () => {
         return;
       }
 
-      const response = await axios.get('http://localhost:8080/api/DoctorCertificate/GetAll', {
+      const response = await axios.get(`${API_URL}/api/DoctorCertificate/GetAll`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -56,7 +57,7 @@ const CertificateManagement = () => {
     if (window.confirm('Bạn có chắc chắn muốn xóa chứng chỉ này?')) {
       try {
         const token = localStorage.getItem('token');
-        await axios.delete(`http://localhost:8080/api/DoctorCertificate/Delete/${certificateId}`, {
+        await axios.delete(`${API_URL}/api/DoctorCertificate/Delete/${certificateId}`, {
           headers: {
             'Authorization': `Bearer ${token}`
           }

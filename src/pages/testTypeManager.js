@@ -11,6 +11,7 @@ const TestTypeManager = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+  const API_URL = process.env.REACT_APP_API_URL;
 
   useEffect(() => {
     fetchTestTypes();
@@ -20,7 +21,7 @@ const TestTypeManager = () => {
     setLoading(true);
     try {
       const token = localStorage.getItem('token');
-      const response = await axios.get('http://localhost:8080/api/TestType/GetAll', {
+      const response = await axios.get(`${API_URL}/api/TestType/GetAll`, {
         headers: { Authorization: `Bearer ${token}` }
       });
 
@@ -48,7 +49,7 @@ const TestTypeManager = () => {
       try {
         const token = localStorage.getItem('token');
         const response = await axios.put(
-          'http://localhost:8080/api/TestType/Update',
+          `${API_URL}/api/TestType/Update`,
           {
             ...testType,
             isActive: false

@@ -12,6 +12,7 @@ const AppointmentManager = () => {
   const [selectedAppointment, setSelectedAppointment] = useState(null);
   const navigate = useNavigate();
   const { user, isAuthenticated } = useAuth();
+  const API_URL = process.env.REACT_APP_API_URL;
 
   useEffect(() => {
     if (!isAuthenticated || !user) {
@@ -35,7 +36,7 @@ const AppointmentManager = () => {
         return;
       }
 
-      const response = await axios.get(`http://localhost:8080/api/Appointment/GetByDoctorId/${user.doctorId}`, {
+      const response = await axios.get(`${API_URL}/api/Appointment/GetByDoctorId/${user.doctorId}`, {
         headers: {
           Authorization: `Bearer ${token}`
         }
@@ -48,7 +49,7 @@ const AppointmentManager = () => {
         // Fetch test results for each appointment
         for (const appointment of appointmentsData) {
           try {
-            const testResultsResponse = await axios.get(`http://localhost:8080/api/TestResult/GetAll`, {
+            const testResultsResponse = await axios.get(`${API_URL}/api/TestResult/GetAll`, {
               headers: {
                 Authorization: `Bearer ${token}`
               }
@@ -82,7 +83,7 @@ const AppointmentManager = () => {
   const handleStatusUpdate = async (appointmentId, newStatus) => {
     try {
       const token = localStorage.getItem('token');
-      const response = await axios.put(`http://localhost:8080/api/Appointment/Update`, {
+      const response = await axios.put(`${API_URL}/api/Appointment/Update`, {
         appointmentId: appointmentId,
         status: newStatus
       }, {

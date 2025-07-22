@@ -14,12 +14,12 @@ const UpdateCertificate = () => {
     issueDate: '',
     expiryDate: ''
   });
-
+  const API_URL = process.env.REACT_APP_API_URL;
   useEffect(() => {
     const fetchCertificate = async () => {
       try {
         const token = localStorage.getItem('token');
-        const apiUrl = `http://localhost:8080/api/DoctorCertificate/GetById/${id}`;
+        const apiUrl = `${API_URL}/api/DoctorCertificate/GetById/${id}`;
         console.log('Calling API URL:', apiUrl);
         
         const response = await axios.get(apiUrl, {
@@ -70,7 +70,7 @@ const UpdateCertificate = () => {
     
     try {
       const token = localStorage.getItem('token');
-      const response = await axios.put(`http://localhost:8080/api/DoctorCertificate/Update`, 
+      const response = await axios.put(`${API_URL}/api/DoctorCertificate/Update`, 
         certificate,
         {
           headers: {

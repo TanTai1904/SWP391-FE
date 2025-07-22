@@ -13,6 +13,7 @@ const CategoryManager = () => {
   });
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
+  const API_URL = process.env.REACT_APP_API_URL;
 
   useEffect(() => {
     fetchCategories();
@@ -21,7 +22,7 @@ const CategoryManager = () => {
   const fetchCategories = async () => {
     try {
       setLoading(true);
-      const response = await axios.get('http://localhost:8080/api/Category/GetAll');
+      const response = await axios.get(`${API_URL}/api/Category/GetAll`);
       if (response.data.status) {
         // Filter to show only active categories
         const activeCategories = response.data.data.filter(category => category.isActive === true);
@@ -53,7 +54,7 @@ const CategoryManager = () => {
           return;
         }
 
-        await axios.put(`http://localhost:8080/api/Category/Update`, {
+        await axios.put(`${API_URL}/api/Category/Update`, {
           categoryId: categoryId,
           categoryName: categoryToUpdate.categoryName, // Include the existing category name
           isActive: false
@@ -75,12 +76,12 @@ const CategoryManager = () => {
     e.preventDefault();
     try {
       if (editingCategory) {
-        await axios.put(`http://localhost:8080/api/Category/Update/${editingCategory.categoryId}`, {
+        await axios.put(`${API_URL}/api/Category/Update/${editingCategory.categoryId}`, {
           ...editingCategory,
           categoryName: formData.categoryName
         });
       } else {
-        await axios.post('http://localhost:8080/api/Category/Create', {
+        await axios.post(`${API_URL}/api/Category/Create`, {
           categoryName: formData.categoryName
         });
       }

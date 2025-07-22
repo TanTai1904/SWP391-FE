@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 
 const DEFAULT_AVATAR = 'https://cdn.sforum.vn/sforum/wp-content/uploads/2023/10/avatar-trang-4.jpg';
+const API_URL = `${process.env.REACT_APP_API_URL}/api`;
 
 const ProfilePage = () => {
   const { user, updateUserInfo } = useAuth();
@@ -110,7 +111,7 @@ const ProfilePage = () => {
         throw new Error('Không xác định được vai trò người dùng');
       }
       
-      let endpoint = `/api/${userRole}/Update`;
+      let endpoint = `/${userRole}/Update`;
       
       // Format date properly
       const formattedDate = editedData.dateOfBirth ? new Date(editedData.dateOfBirth).toISOString().split('T')[0] : null;
@@ -149,7 +150,7 @@ const ProfilePage = () => {
 
       console.log('Update Data to be sent:', updateData);
 
-      const response = await fetch(`${process.env.REACT_APP_API_URL || 'http://localhost:8080'}${endpoint}`, {
+      const response = await fetch(`${API_URL}${endpoint}`, {
         method: 'PUT',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -242,9 +243,9 @@ const ProfilePage = () => {
             endpointId = user.userId;
         }
 
-        const endpoint = `/api/${roleEndpoints[userRole]}/GetByID/${endpointId}`;
+        const endpoint = `/${roleEndpoints[userRole]}/GetByID/${endpointId}`;
 
-        const response = await fetch(`http://localhost:8080${endpoint}`, {
+        const response = await fetch(`${API_URL}${endpoint}`, {
           headers: {
             'Authorization': `Bearer ${token}`,
             'Content-Type': 'application/json'

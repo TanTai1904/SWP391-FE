@@ -10,6 +10,7 @@ const ARVComponentManager = () => {
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const navigate = useNavigate();
+  const API_URL = process.env.REACT_APP_API_URL;
 
   useEffect(() => {
     fetchComponents();
@@ -18,7 +19,7 @@ const ARVComponentManager = () => {
   const fetchComponents = async () => {
     try {
       const token = localStorage.getItem('token');
-      const response = await axios.get('http://localhost:8080/api/ARVComponents/GetAll', {
+      const response = await axios.get(`${API_URL}/api/ARVComponents/GetAll`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -47,7 +48,7 @@ const ARVComponentManager = () => {
         };
 
         const response = await axios.put(
-          `http://localhost:8080/api/ARVComponents/Update`,
+          `${API_URL}/api/ARVComponents/Update`,
           updateData,
           {
             headers: {

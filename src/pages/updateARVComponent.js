@@ -15,7 +15,7 @@ const UpdateARVComponent = () => {
     description: '',
     isActive: true
   });
-
+  const API_URL = process.env.REACT_APP_API_URL;
   useEffect(() => {
     const fetchComponent = async () => {
       const token = localStorage.getItem('token');
@@ -28,7 +28,7 @@ const UpdateARVComponent = () => {
 
       try {
         const response = await axios.get(
-          `http://localhost:8080/api/ARVComponents/GetByID/${componentId}`,
+          `${API_URL}/api/ARVComponents/GetByID/${componentId}`,
           {
             headers: {
               'Authorization': `Bearer ${token}`,
@@ -109,7 +109,7 @@ const UpdateARVComponent = () => {
       console.log('Sending update data:', updateData);
 
       const response = await axios.put(
-        'http://localhost:8080/api/ARVComponents/Update',
+        `${API_URL}/api/ARVComponents/Update`,
         updateData,
         {
           headers: {

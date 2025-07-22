@@ -12,6 +12,7 @@ const CreateCategory = () => {
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const API_URL = process.env.REACT_APP_API_URL;
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -28,7 +29,7 @@ const CreateCategory = () => {
         return;
       }
 
-      const response = await axios.post('http://localhost:8080/api/Category/Create', 
+      const response = await axios.post(`${API_URL}/api/Category/Create`, 
         {
           categoryName: formData.categoryName,
           isActive: true

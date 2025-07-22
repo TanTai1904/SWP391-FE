@@ -5,6 +5,7 @@ const RegisterPage = () => {
   const navigate = useNavigate();
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const API_URL = `${process.env.REACT_APP_API_URL}/api`;
   const [formData, setFormData] = useState({
     username: '',
     password: '',
@@ -33,7 +34,7 @@ const RegisterPage = () => {
     setLoading(true);
 
     try {
-      const response = await fetch('http://localhost:8080/api/Patient/Create', {
+      const response = await fetch(`${API_URL}/Patient/Create`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -54,7 +55,7 @@ const RegisterPage = () => {
       }
 
       // Gửi email xác thực
-      const sendEmailResponse = await fetch('http://localhost:8080/api/Email/SendEmail', {
+      const sendEmailResponse = await fetch(`${API_URL}/Email/SendEmail`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

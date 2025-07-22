@@ -28,7 +28,7 @@ const UpdateTestType = () => {
     normalRange: '',
     isActive: true
   });
-
+  const API_URL = process.env.REACT_APP_API_URL;
   useEffect(() => {
     fetchTestType();
   }, [id]);
@@ -36,7 +36,7 @@ const UpdateTestType = () => {
   const fetchTestType = async () => {
     try {
       const token = localStorage.getItem('token');
-      const response = await axios.get(`http://localhost:8080/api/TestType/GetByID/${id}`, {
+      const response = await axios.get(`${API_URL}/api/TestType/GetByID/${id}`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -84,7 +84,7 @@ const UpdateTestType = () => {
     try {
       const token = localStorage.getItem('token');
       const response = await axios.put(
-        'http://localhost:8080/api/TestType/Update',
+        `${API_URL}/api/TestType/Update`,
         formData,
         {
           headers: {

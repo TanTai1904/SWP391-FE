@@ -9,6 +9,7 @@ const CreateTreatment = () => {
   const location = useLocation();
   const { user } = useAuth();
   const [loading, setLoading] = useState(false);
+  const API_URL = process.env.REACT_APP_API_URL;
   
   // Ensure IDs are numbers from the start
   const testResultId = location.state?.testResultId ? Number(location.state.testResultId) : null;
@@ -111,7 +112,7 @@ const CreateTreatment = () => {
     try {
       const token = localStorage.getItem('token');
       const response = await axios.post(
-        'http://localhost:8080/api/Treatment/Create',
+        `${API_URL}/api/Treatment/Create`,
         submitData,
         {
           headers: {
@@ -128,7 +129,7 @@ const CreateTreatment = () => {
           console.log('Treatment created with ID:', treatmentId);
           
           const emailResponse = await axios.post(
-            'http://localhost:8080/api/Email/SendTreatmentCreatedEmail',
+            `${API_URL}/api/Email/SendTreatmentCreatedEmail`,
             { treatmentId: parseInt(treatmentId) },
             {
               headers: {
@@ -152,7 +153,7 @@ const CreateTreatment = () => {
           await new Promise(resolve => setTimeout(resolve, 1000));
 
           const updateResponse = await axios.put(
-            'http://localhost:8080/api/Appointment/Update',
+            `${API_URL}/api/Appointment/Update`,
             {
               appointmentId: Number(appointmentId),
               status: 'Completed'

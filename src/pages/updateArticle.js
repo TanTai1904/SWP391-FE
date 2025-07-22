@@ -16,6 +16,7 @@ const UpdateArticle = () => {
     isActive: true,
     userId: 0
   });
+  const API_URL = process.env.REACT_APP_API_URL;
   const [error, setError] = useState('');
 
   useEffect(() => {
@@ -30,7 +31,7 @@ const UpdateArticle = () => {
 
       try {
         // Fetch article details
-        const articleResponse = await axios.get(`http://localhost:8080/api/Article/GetByID/${id}`, {
+        const articleResponse = await axios.get(`${API_URL}/api/Article/GetByID/${id}`, {
           headers: {
             'Authorization': `Bearer ${token}`,
             'Content-Type': 'application/json'
@@ -53,7 +54,7 @@ const UpdateArticle = () => {
         }
 
         // Fetch categories
-        const categoryResponse = await axios.get('http://localhost:8080/api/Category/GetAll', {
+        const categoryResponse = await axios.get(`${API_URL}/api/Category/GetAll`, {
           headers: {
             'Authorization': `Bearer ${token}`,
             'Content-Type': 'application/json'
@@ -100,7 +101,7 @@ const UpdateArticle = () => {
         return;
       }
 
-      const response = await axios.put('http://localhost:8080/api/Article/Update',
+      const response = await axios.put(`${API_URL}/api/Article/Update`,
         {
           ...formData,
           categoryId: parseInt(formData.categoryId),

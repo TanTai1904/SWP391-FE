@@ -15,6 +15,7 @@ const UpdateCategory = () => {
   const [loading, setLoading] = useState(false);
   const [initialLoading, setInitialLoading] = useState(true);
   const [error, setError] = useState('');
+  const API_URL = process.env.REACT_APP_API_URL;
 
   useEffect(() => {
     fetchCategoryDetails();
@@ -28,7 +29,7 @@ const UpdateCategory = () => {
         return;
       }
 
-      const response = await axios.get(`http://localhost:8080/api/Category/GetById/${id}`, {
+      const response = await axios.get(`${API_URL}/api/Category/GetById/${id}`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -69,7 +70,7 @@ const UpdateCategory = () => {
         return;
       }
 
-      const response = await axios.put('http://localhost:8080/api/Category/Update', 
+      const response = await axios.put(`${API_URL}/api/Category/Update`, 
         {
           categoryId: formData.categoryId,
           categoryName: formData.categoryName,

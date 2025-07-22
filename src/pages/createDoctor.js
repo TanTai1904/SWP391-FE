@@ -16,7 +16,7 @@ const CreateDoctor = () => {
     address: '',
     bio: ''
   });
-
+  const API_URL = process.env.REACT_APP_API_URL;
   const [errors, setErrors] = useState({});
 
   const validateForm = () => {
@@ -84,7 +84,7 @@ const CreateDoctor = () => {
     try {
       const token = localStorage.getItem('token');
       const response = await axios.post(
-        'http://localhost:8080/api/Doctor/Create',
+        `${API_URL}/api/Doctor/Create`,
         formData,
         {
           headers: {

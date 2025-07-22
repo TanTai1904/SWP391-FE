@@ -51,6 +51,12 @@ import CreateStaff from './pages/createStaff';
 import UpdateStaff from './pages/updateStaff';
 import TestResultManager from './pages/testResultManager';
 import UpdateTestResult from './pages/updateTestResult';
+import TreatmentForPatient from './pages/treatmentForPatient';
+import TestResultForPatient from './pages/testResultForPatient';
+import ScheduleManager from './pages/scheduleManager';
+import CreateSchedule from './pages/createSchedule';
+import UpdateSchedule from './pages/updateSchedule';
+import ViewListWorkSchedule from './pages/viewListWorkSchedule';
 
 function App() {
   return (
@@ -386,6 +392,54 @@ function App() {
                         element={
                           <PrivateRoute>
                             <UpdateTestResult />
+                          </PrivateRoute>
+                        }
+                      />
+                      <Route
+                        path="/treatment-for-patient/:appointmentId"
+                        element={
+                          <PrivateRoute>
+                            <TreatmentForPatient />
+                          </PrivateRoute>
+                        }
+                      />
+                      <Route
+                        path="/test-result-for-patient/:appointmentId"
+                        element={
+                          <PrivateRoute>
+                            <TestResultForPatient />
+                          </PrivateRoute>
+                        }
+                      />
+                      <Route
+                        path="/schedule-manager/:doctorId"
+                        element={
+                          <PrivateRoute>
+                            <ScheduleManager />
+                          </PrivateRoute>
+                        }
+                      />
+                      <Route
+                        path="/update-schedule/:scheduleId"
+                        element={
+                          <PrivateRoute>
+                            <UpdateSchedule />
+                          </PrivateRoute>
+                        }
+                      />
+                      <Route
+                        path="/schedule/create/:doctorId"
+                        element={
+                          <PrivateRoute>
+                            <CreateSchedule />
+                          </PrivateRoute>
+                        }
+                      />
+                      <Route
+                        path="/my-schedules"
+                        element={
+                          <PrivateRoute>
+                            <ViewListWorkSchedule />
                           </PrivateRoute>
                         }
                       />

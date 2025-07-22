@@ -20,7 +20,7 @@ const UpdateTestResult = () => {
     normalRange: '',
     unit: '',
   });
-
+  const API_URL = process.env.REACT_APP_API_URL;
   useEffect(() => {
     fetchTestResult();
   }, [id]);
@@ -28,7 +28,7 @@ const UpdateTestResult = () => {
   const fetchTestResult = async () => {
     try {
       const token = localStorage.getItem('token');
-      const response = await axios.get(`http://localhost:8080/api/TestResult/GetByID/${id}`, {
+      const response = await axios.get(`${API_URL}/api/TestResult/GetByID/${id}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
 
@@ -79,7 +79,7 @@ const UpdateTestResult = () => {
       // First, check if this appointment already has a test result
       try {
         const checkResponse = await axios.get(
-          `http://localhost:8080/api/TestResult/GetByAppointmentId/${testResult.appointmentId}`,
+          `${API_URL}/api/TestResult/GetByAppointmentId/${testResult.appointmentId}`,
           {
             headers: {
               Authorization: `Bearer ${token}`
@@ -111,7 +111,7 @@ const UpdateTestResult = () => {
       console.log('Sending update data:', updateData);
 
       const response = await axios.put(
-        'http://localhost:8080/api/TestResult/Update',
+        `${API_URL}/api/TestResult/Update`,
         updateData,
         {
           headers: {

@@ -15,6 +15,7 @@ const CreateStaff = () => {
     gender: 'Male',
     address: ''
   });
+  const API_URL = process.env.REACT_APP_API_URL;
 
   const [errors, setErrors] = useState({});
 
@@ -78,7 +79,7 @@ const CreateStaff = () => {
     try {
       const token = localStorage.getItem('token');
       const response = await axios.post(
-        'http://localhost:8080/api/Staff/Create',
+        `${API_URL}/api/Staff/Create`,
         formData,
         {
           headers: {

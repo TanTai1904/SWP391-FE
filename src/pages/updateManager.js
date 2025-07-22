@@ -21,7 +21,7 @@ const UpdateManager = () => {
     address: '',
     isActive: true
   });
-
+  const API_URL = process.env.REACT_APP_API_URL;
   const [errors, setErrors] = useState({});
 
   useEffect(() => {
@@ -31,7 +31,7 @@ const UpdateManager = () => {
   const fetchManagerData = async () => {
     try {
       const token = localStorage.getItem('token');
-      const response = await axios.get(`http://localhost:8080/api/Manager/GetByID/${id}`, {
+      const response = await axios.get(`${API_URL}/api/Manager/GetByID/${id}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
 
@@ -160,7 +160,7 @@ const UpdateManager = () => {
       console.log('Sending update data:', updateData); // For debugging
 
       const response = await axios.put(
-        'http://localhost:8080/api/Manager/Update',
+        `${API_URL}/api/Manager/Update`,
         updateData,
         {
           headers: {

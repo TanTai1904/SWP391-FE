@@ -10,6 +10,7 @@ const TestResultManager = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
+  const API_URL = process.env.REACT_APP_API_URL;
 
   useEffect(() => {
     fetchTestResults();
@@ -19,7 +20,7 @@ const TestResultManager = () => {
     setLoading(true);
     try {
       const token = localStorage.getItem('token');
-      const response = await axios.get('http://localhost:8080/api/TestResult/GetAll', {
+      const response = await axios.get(`${API_URL}/api/TestResult/GetAll`, {
         headers: { Authorization: `Bearer ${token}` }
       });
 

@@ -9,6 +9,7 @@ const ManagerPage = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
+  const API_URL = process.env.REACT_APP_API_URL;
 
   useEffect(() => {
     fetchManagers();
@@ -18,7 +19,7 @@ const ManagerPage = () => {
     setLoading(true);
     try {
       const token = localStorage.getItem('token');
-      const response = await axios.get('http://localhost:8080/api/Manager/GetAll', {
+      const response = await axios.get(`${API_URL}/api/Manager/GetAll`, {
         headers: { Authorization: `Bearer ${token}` }
       });
 
@@ -52,7 +53,7 @@ const ManagerPage = () => {
         console.log('Sending update data:', updateData); // Log để debug
 
         const response = await axios.put(
-          'http://localhost:8080/api/Manager/Update',
+          `${API_URL}/api/Manager/Update`,
           updateData,
           {
             headers: {

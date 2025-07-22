@@ -11,6 +11,7 @@ const StandardProtocol = () => {
   const [loading, setLoading] = useState(true);
   const [regimens, setRegimens] = useState([]);
   const [selectedRegimen, setSelectedRegimen] = useState(null);
+  const API_URL = process.env.REACT_APP_API_URL;
 
   useEffect(() => {
     // Log thông tin state khi component được khởi tạo
@@ -23,7 +24,7 @@ const StandardProtocol = () => {
   const fetchStandardRegimens = async () => {
     try {
       const token = localStorage.getItem('token');
-      const response = await axios.get('http://localhost:8080/api/ARVRegimens/GetByIsCustomized/false', {
+      const response = await axios.get(`${API_URL}/api/ARVRegimens/GetByIsCustomized/false`, {
         headers: {
           Authorization: `Bearer ${token}`
         }

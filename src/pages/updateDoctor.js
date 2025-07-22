@@ -17,7 +17,7 @@ const UpdateDoctor = () => {
     doctorId: 0,
     bio: ''
   });
-
+  const API_URL = process.env.REACT_APP_API_URL;
   const [errors, setErrors] = useState({});
 
   // Fetch doctor data
@@ -26,7 +26,7 @@ const UpdateDoctor = () => {
       try {
         const token = localStorage.getItem('token');
         const response = await axios.get(
-          `http://localhost:8080/api/Doctor/GetByID/${id}`,
+          `${API_URL}/api/Doctor/GetByID/${id}`,
           {
             headers: {
               'Authorization': `Bearer ${token}`,
@@ -111,7 +111,7 @@ const UpdateDoctor = () => {
     try {
       const token = localStorage.getItem('token');
       const response = await axios.put(
-        'http://localhost:8080/api/Doctor/Update',
+        `${API_URL}/api/Doctor/Update`,
         formData,
         {
           headers: {

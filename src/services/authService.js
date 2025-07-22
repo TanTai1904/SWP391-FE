@@ -1,6 +1,6 @@
 import { toast } from 'react-toastify';
 
-const API_URL = 'http://localhost:8080/api';
+const API_URL = `${process.env.REACT_APP_API_URL}/api`;
 
 export const login = async (username, password) => {
   try {

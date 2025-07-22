@@ -23,6 +23,7 @@ const CreateRegimens = () => {
     frequency: 2,
     isCustomized: true
   });
+  const API_URL = process.env.REACT_APP_API_URL;
 
   useEffect(() => {
     // Log thông tin state khi component được khởi tạo
@@ -35,7 +36,7 @@ const CreateRegimens = () => {
   const fetchComponents = async () => {
     try {
       const token = localStorage.getItem('token');
-      const response = await axios.get('http://localhost:8080/api/ARVComponents/GetAll', {
+      const response = await axios.get(`${API_URL}/api/ARVComponents/GetAll`, {
         headers: {
           Authorization: `Bearer ${token}`
         }
@@ -82,7 +83,7 @@ const CreateRegimens = () => {
 
     try {
       const token = localStorage.getItem('token');
-      const response = await axios.post('http://localhost:8080/api/ARVRegimens/Create', 
+      const response = await axios.post(`${API_URL}/api/ARVRegimens/Create`, 
         {
           ...formData,
           // Chuyển đổi các ID thành số hoặc null

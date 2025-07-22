@@ -16,6 +16,7 @@ const ALLOWED_UNITS = [
   'S/C',
   'N/A'
 ];
+const API_URL = process.env.REACT_APP_API_URL;
 
 const CreateTestType = () => {
   const navigate = useNavigate();
@@ -49,7 +50,7 @@ const CreateTestType = () => {
     try {
       const token = localStorage.getItem('token');
       const response = await axios.post(
-        'http://localhost:8080/api/TestType/Create',
+        `${API_URL}/api/TestType/Create`,
         requestData,
         {
           headers: {

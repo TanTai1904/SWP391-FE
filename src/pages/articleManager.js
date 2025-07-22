@@ -13,6 +13,7 @@ const ArticleManager = () => {
   const [articles, setArticles] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const API_URL = process.env.REACT_APP_API_URL;
 
   useEffect(() => {
     fetchArticles();
@@ -28,7 +29,7 @@ const ArticleManager = () => {
         return;
       }
 
-      const response = await axios.get('http://localhost:8080/api/Article/GetAll', {
+      const response = await axios.get(`${API_URL}/api/Article/GetAll`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -56,7 +57,7 @@ const ArticleManager = () => {
     if (window.confirm('Bạn có chắc chắn muốn xóa bài viết này?')) {
       try {
         const token = localStorage.getItem('token');
-        await axios.delete(`http://localhost:8080/api/Article/Delete/${articleId}`, {
+        await axios.delete(`${API_URL}/api/Article/Delete/${articleId}`, {
           headers: {
             'Authorization': `Bearer ${token}`
           }
@@ -72,7 +73,7 @@ const ArticleManager = () => {
   const toggleStatus = async (article) => {
     try {
       const token = localStorage.getItem('token');
-      await axios.put(`http://localhost:8080/api/Article/Update`,
+      await axios.put(`${API_URL}/api/Article/Update`,
         {
           ...article,
           isActive: !article.isActive

@@ -10,7 +10,7 @@ const StaffManager = () => {
   const [loading, setLoading] = useState(true);
   const [isDeleting, setIsDeleting] = useState(false);
   const navigate = useNavigate();
-
+  const API_URL = process.env.REACT_APP_API_URL;
   useEffect(() => {
     fetchStaffs();
   }, []);
@@ -19,7 +19,7 @@ const StaffManager = () => {
     setLoading(true);
     try {
       const token = localStorage.getItem('token');
-      const response = await axios.get('http://localhost:8080/api/Staff/GetAll', {
+      const response = await axios.get(`${API_URL}/api/Staff/GetAll`, {
         headers: { Authorization: `Bearer ${token}` }
       });
 
@@ -51,7 +51,7 @@ const StaffManager = () => {
         };
 
         const response = await axios.put(
-          'http://localhost:8080/api/Staff/Update',
+          `${API_URL}/api/Staff/Update`,
           updateData,
           {
             headers: {

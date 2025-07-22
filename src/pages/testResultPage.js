@@ -19,6 +19,7 @@ const TestResultPage = () => {
     resultValue: '',
     notes: ''
   });
+  const API_URL = process.env.REACT_APP_API_URL;
 
   useEffect(() => {
     if (!isAuthenticated || !user) {
@@ -44,7 +45,7 @@ const TestResultPage = () => {
   const fetchAppointmentData = async () => {
     try {
       const token = localStorage.getItem('token');
-      const response = await axios.get(`http://localhost:8080/api/Appointment/GetByID/${location.state.appointmentId}`, {
+      const response = await axios.get(`${API_URL}/api/Appointment/GetByID/${location.state.appointmentId}`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -69,7 +70,7 @@ const TestResultPage = () => {
   const fetchTestTypes = async () => {
     try {
       const token = localStorage.getItem('token');
-      const response = await axios.get('http://localhost:8080/api/TestType/GetAll', {
+      const response = await axios.get(`${API_URL}/api/TestType/GetAll`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -106,7 +107,7 @@ const TestResultPage = () => {
         notes: formData.notes
       };
 
-      const response = await axios.post('http://localhost:8080/api/TestResult/Create', submitData, {
+      const response = await axios.post(`${API_URL}/api/TestResult/Create`, submitData, {
         headers: {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${token}`
@@ -117,7 +118,7 @@ const TestResultPage = () => {
         // Thêm đoạn code cập nhật trạng thái appointment thành Confirmed
         try {
           const updateResponse = await axios.put(
-            'http://localhost:8080/api/Appointment/Update',
+            `${API_URL}/api/Appointment/Update`,
             {
               appointmentId: formData.appointmentId,
               status: 'Confirmed'  // Giữ nguyên trạng thái Confirmed

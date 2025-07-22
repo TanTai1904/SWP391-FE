@@ -20,7 +20,7 @@ const UpdateStaff = () => {
     address: '',
     isActive: true
   });
-
+  const API_URL = process.env.REACT_APP_API_URL;
   const [errors, setErrors] = useState({});
 
   useEffect(() => {
@@ -28,7 +28,7 @@ const UpdateStaff = () => {
       try {
         const token = localStorage.getItem('token');
         const response = await axios.get(
-          `http://localhost:8080/api/Staff/GetByID/${id}`,
+          `${API_URL}/api/Staff/GetByID/${id}`,
           {
             headers: {
               'Authorization': `Bearer ${token}`,
@@ -141,7 +141,7 @@ const UpdateStaff = () => {
       };
 
       const response = await axios.put(
-        'http://localhost:8080/api/Staff/Update',
+          `${API_URL}/api/Staff/Update`,
         updateData,
         {
           headers: {

@@ -13,6 +13,7 @@ const CreateArticle = () => {
     categoryId: '',
   });
   const [error, setError] = useState('');
+  const API_URL = process.env.REACT_APP_API_URL;
 
   useEffect(() => {
     // Check if user is logged in
@@ -27,7 +28,7 @@ const CreateArticle = () => {
     // Fetch categories for dropdown
     const fetchCategories = async () => {
       try {
-        const response = await axios.get('http://localhost:8080/api/Category/GetAll', {
+        const response = await axios.get(`${API_URL}/api/Category/GetAll`, {
           headers: {
             'Authorization': `Bearer ${token}`,
             'Content-Type': 'application/json'
@@ -75,7 +76,7 @@ const CreateArticle = () => {
         return;
       }
 
-      const response = await axios.post('http://localhost:8080/api/Article/Create', 
+      const response = await axios.post(`${API_URL}/api/Article/Create`, 
         {
           ...formData,
           categoryId: parseInt(formData.categoryId),

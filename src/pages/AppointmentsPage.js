@@ -16,6 +16,7 @@ const AppointmentsPage = () => {
   const [selectedTestType, setSelectedTestType] = useState(null);
   const [isAnonymous, setIsAnonymous] = useState(false);
   const navigate = useNavigate();
+  const API_URL = process.env.REACT_APP_API_URL;
 
   useEffect(() => {
     // Kiểm tra role khi component mount
@@ -43,7 +44,7 @@ const AppointmentsPage = () => {
     const fetchTestTypes = async () => {
       const token = getToken();
       try {
-        const response = await axios.get('http://localhost:8080/api/TestType/GetAll', {
+        const response = await axios.get(`${API_URL}/api/TestType/GetAll`, {
           headers: {
             'Authorization': `Bearer ${token}`
           }
@@ -81,7 +82,7 @@ const AppointmentsPage = () => {
   const fetchDoctorDetails = async (doctorId) => {
     const token = getToken();
     try {
-      const response = await axios.get(`http://localhost:8080/api/Doctor/GetByID/${doctorId}`, {
+      const response = await axios.get(`${API_URL}/api/Doctor/GetByID/${doctorId}`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -118,7 +119,7 @@ const AppointmentsPage = () => {
       const formattedDate = formatDate(date);
       const formattedTime = formatTime(time);
       
-      const response = await axios.get(`http://localhost:8080/api/Appointment/GetAvailableDoctors`, {
+      const response = await axios.get(`${API_URL}/api/Appointment/GetAvailableDoctors`, {
         params: {
           appointmentDate: formattedDate,
           appointmentTime: formattedTime
@@ -206,7 +207,7 @@ const AppointmentsPage = () => {
       console.log('Sending appointment data:', appointmentData);
 
       const response = await axios.post(
-        'http://localhost:8080/api/Appointment/Create',
+        `${API_URL}/api/Appointment/Create`,
         appointmentData,
         {
           headers: {
