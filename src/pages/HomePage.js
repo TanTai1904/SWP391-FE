@@ -23,12 +23,16 @@ const HomePage = () => {
         const categoriesData = categoriesResponse.data?.data || [];
         const articlesData = articlesResponse.data?.data || [];
 
-        // Filter out inactive articles
+        // Filter out inactive categories and articles
+        const activeCategories = Array.isArray(categoriesData)
+          ? categoriesData.filter(category => category.isActive === true)
+          : [];
+          
         const activeArticles = Array.isArray(articlesData) 
           ? articlesData.filter(article => article.isActive === true)
           : [];
 
-        setCategories(Array.isArray(categoriesData) ? categoriesData : []);
+        setCategories(activeCategories);
         setArticles(activeArticles);
         setLoading(false);
       } catch (err) {

@@ -64,7 +64,7 @@ const ScheduleManager = () => {
             } else if (user.role === 'Doctor' && user.doctorId) {
                 // Bác sĩ xem lịch của chính mình
                 endpoint = `${API_URL}/DoctorSchedule/GetByDoctorId/${user.doctorId}`;
-            } else if (['Admin', 'Manager'].includes(user.role)) {
+            } else if (['Admin', 'Manager', 'Staff'].includes(user.role)) {
                 // Admin/Manager xem tất cả lịch
                 endpoint = `${API_URL}/DoctorSchedule/GetAll`;
             } else {

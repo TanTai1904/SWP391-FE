@@ -54,8 +54,8 @@ const CreateSchedule = () => {
                 return;
             }
 
-            // Nếu là admin/manager xem từ URL
-            if (['Admin', 'Manager'].includes(userRole) && urlDoctorId) {
+            // Nếu là admin/manager/staff xem từ URL
+            if (['Admin', 'Manager', 'Staff'].includes(userRole) && urlDoctorId) {
                 return;
             }
 
