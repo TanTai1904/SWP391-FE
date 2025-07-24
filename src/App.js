@@ -57,6 +57,7 @@ import ScheduleManager from './pages/scheduleManager';
 import CreateSchedule from './pages/createSchedule';
 import UpdateSchedule from './pages/updateSchedule';
 import ViewListWorkSchedule from './pages/viewListWorkSchedule';
+import ForgetPassword from './pages/forgetPassword';
 
 function App() {
   return (
@@ -68,6 +69,7 @@ function App() {
             <Route path="/login" element={<LoginPage />} />
             <Route path="/register" element={<RegisterPage />} />
             <Route path="/verify" element={<VerifyPage />} />
+            <Route path="/forgot-password" element={<ForgetPassword />} />
 
             {/* Routes with layout */}
             <Route
